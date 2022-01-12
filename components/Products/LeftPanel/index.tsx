@@ -66,8 +66,12 @@ const LeftPanel: React.FunctionComponent<ILeftPanelProps> = ({user}): any => {
   const selectedLink = selectedIndex === -1 ? links[0].type : links[selectedIndex].type;
 
   const goToDetail = (type: string) => {
-    router.push(`/${getProp(product, 'product.owner', '')}/${productSlug}${type}`).then();
-  }
+    router.push(detailedUrl(type)).then();
+  };
+
+  const detailedUrl = (type: string) => {
+    return `/${getProp(product, "product.owner", "")}/${productSlug}${type}`;
+  };
 
   const handleWindowSizeChange = () => {
     setIsMobile(window.innerWidth < 768);
@@ -98,18 +102,14 @@ const LeftPanel: React.FunctionComponent<ILeftPanelProps> = ({user}): any => {
 
 
   const menu = (
-    <Menu mode="inline" selectedKeys={[selectedLink]} >
+    <Menu mode="inline" selectedKeys={[selectedLink]}>
       {links.map((link: any) => (
-        <Menu.Item
-          key={link.type}
-          onClick={() => goToDetail(link.url)}
-        >
-          {link.name}
+        <Menu.Item key={link.type}>
+          <a href={detailedUrl(link.url)}>{link.name}</a>
         </Menu.Item>
       ))}
     </Menu>
-  )
-
+  );
   const mobileMenu = (
     <div style={{padding: "0 24px 10px 24px"}}>
       <Select defaultValue={selectedLink}

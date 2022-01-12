@@ -55,6 +55,7 @@ import Head from "next/head";
 import ToReviewModal from "../../../../components/Products/ToReviewModal";
 import {UploadFile} from "antd/es/upload/interface";
 import DeliveryMessageModal from "../../../../components/Products/DeliveryMessageModal";
+import Avatar from "antd/lib/avatar/avatar";
 
 const {Panel} = Collapse;
 
@@ -422,13 +423,8 @@ const Task: React.FunctionComponent<Params> = ({
                             <Row style={{marginTop: 10}} className="text-sm mt-8">
                                 <strong className="my-auto">Assigned to: </strong>
                                 <Row align="middle" style={{marginLeft: 15}}>
-                                    <Col>
-                                        <CustomAvatar2
-                                            person={{
-                                                firstName: getProp(assignee, "firstName", ""),
-                                                slug: getProp(assignee, "slug", ""),
-                                            }}
-                                        />
+                                    <Col style={{marginRight:'5px'}}>
+                                        <Avatar/>
                                     </Col>
                                     <Col>
                                         <Typography.Link

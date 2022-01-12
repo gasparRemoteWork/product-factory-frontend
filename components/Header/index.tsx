@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
-import {Button, message, Row, Col, Menu, Dropdown} from "antd";
+import {Avatar, Button, message, Row, Col, Menu, Dropdown} from "antd";
 import {setLoginURL, setRegisterURL, userLogInAction} from "../../lib/actions";
 import {UserState} from "../../lib/reducers/user.reducer";
 // @ts-ignore
@@ -9,12 +9,14 @@ import DiscordLogo from "../../public/assets/discord-logo.png";
 import BetaTag from "../../public/assets/beta-tag.svg";
 import Link from "next/link";
 import {useMutation, useQuery, useLazyQuery} from "@apollo/react-hooks";
-import {GET_AM_LOGIN_URL, GET_AM_REGISTER_URL, GET_PERSON} from "../../graphql/queries";
+import {GET_AM_LOGIN_URL, GET_AM_REGISTER_URL, GET_PERSON, GET_PERSON_INFO} from "../../graphql/queries";
 import {USER_ROLES} from "../../graphql/types";
 import LoginViaAM from "../LoginViaAM";
 import RegisterViaAM from "../RegisterViaAM";
 import {LOGOUT} from "../../graphql/mutations";
 import {MenuOutlined, DownOutlined, LogoutOutlined, UserOutlined, BookOutlined} from "@ant-design/icons";
+import {apiDomain} from "../../utilities/constants";
+import {ProfileType} from "../../components/Portfolio/interfaces";
 
 const redirectToLocalName = "redirectTo";
 
@@ -29,8 +31,27 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
     const {data: authMachineLoginData} = useQuery(GET_AM_LOGIN_URL);
     const {data: authMachineRegisterData} = useQuery(GET_AM_REGISTER_URL);
     const [loadPerson, {data: getPersonData}] = useLazyQuery(GET_PERSON, {fetchPolicy: "no-cache"});
-   
+    
+    const personSlug = user.username
+    const {data: profileData} = personSlug != null ? useQuery(GET_PERSON_INFO, {variables: {personSlug}}) : null
+
     const [personData, setPersonData] = useState(null);
+    const [profile, setProfile] = useState<ProfileType>({
+        id: '',
+        firstName: '',
+        bio: '',
+        slug: '',
+        avatar: '',
+        skills: [],
+        websites: [],
+        websiteTypes: []
+    });
+
+    useEffect(() => {
+        if (profileData?.personInfo) {
+            setProfile(profileData.personInfo);
+        }
+    }, [profileData]);
 
     const updatePersonData = (updatedData) => {
         if(updatedData) {
@@ -214,7 +235,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
             <Row align="middle" justify="center" style={{height: 56, borderBottom: "1px solid #d9d9d9"}}
                  className="header-desktop">
                 <Col xl={20} lg={22}>
-                    <Row className="container">
+                    <Row className="container" style={{height:'40px'}}>
                         <Col span={9}>
                             <Row justify="start" align="middle">
                                 <Col style={{marginRight: 20}}>
@@ -261,6 +282,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                                         user && user.isLoggedIn ? (
                                             <Dropdown overlay={menu} placement="bottomRight" className="ml-15">
                                                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                                                    <Avatar size={35} style={{marginRight:'5px'}} icon={<UserOutlined/>} src={apiDomain + profile != null ? profile.avatar : ''}/>
                                                     <strong className="text-grey-9">{user.username}</strong>
                                                     <DownOutlined className="text-grey-9 ml-5"/>
                                                 </a>

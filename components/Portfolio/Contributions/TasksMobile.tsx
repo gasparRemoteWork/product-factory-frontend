@@ -1,5 +1,5 @@
 import {TasksComponentProps} from "../interfaces";
-import {Avatar, Button, Col, Row, Typography} from "antd";
+import {Avatar, Button, Col, Row, Divider, Typography} from "antd";
 import React from "react";
 
 const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
@@ -17,11 +17,16 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
                             }}>{task.title}</Typography.Text>
                         </Row>
                         <Row align={"middle"} justify={"space-between"}>
-                            {task.skills && task.skills.map((skill) => (<Col>
+                            <Col style={{marginLeft:'10px', marginTop:'10px'}}>
                                 <Typography.Text style={{fontSize: 12, fontFamily: "Roboto"}}>
-                                    {skill.category} {skill.expertise ? `$(${skill.expertise})` : null}
+                                    {task.expertise.length === 0 
+                                    ?
+                                        null
+                                    : 
+                                        <Col style={{marginLeft:'0px', marginBottom:'10px', fontFamily:'Roboto', fontSize:'12px', borderRadius:'3px', backgroundColor:'rgb(245, 245, 245)', color:'rgb(89, 89, 89)', padding:'3px', paddingLeft:'5px', paddingRight:'5px', alignSelf:'start'}}>{task.category.name + ' ' + '(' + task.expertise.map((exp, index) => index === 0 ? exp.name : ' ' + exp.name  )+ ')'}</Col>
+                                    }
                                 </Typography.Text>
-                            </Col>))}
+                            </Col>
                         </Row>
                         <Row justify={"space-between"} align={"middle"}>
                             <Col style={{marginLeft: 30}}>
@@ -48,6 +53,7 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
                             </Col>
                         </Row>
                     </Col>
+                    <Divider/>
                 </Row>)
             )}
         </>

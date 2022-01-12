@@ -9,7 +9,7 @@ const TasksDesktop = ({tasks, openTaskDetail}: TasksComponentProps) => {
                 <Row
                   key={index} gutter={[10, 0]}
                   justify="space-between"
-                  style={{height: 65, margin: '20px 35px', borderBottom: '1px solid #E7E7E7'}}
+                  style={{minHeight: 65, margin: '20px 35px', borderBottom: '1px solid #E7E7E7'}}
                 >
                     <Col>
                         <Row gutter={[15, 0]}>
@@ -20,19 +20,26 @@ const TasksDesktop = ({tasks, openTaskDetail}: TasksComponentProps) => {
                             </Col>
                             <Col style={{maxWidth: '500px'}}>
                                 <Row>
-                                    <Row align="top">
-                                        <Typography.Text strong style={{
-                                            fontSize: 14,
-                                            fontFamily: "Roboto",
-                                        }}>{task.title}</Typography.Text>
-                                    </Row>
-                                    <Row align="bottom" justify="space-between">
-                                        {task.skills && task.skills.map((skill) => (<Col>
-                                            <Typography.Text style={{fontSize: 12, fontFamily: "Roboto"}}>
-                                                {skill.category} {skill.expertise ? `$(${skill.expertise})` : null}
-                                            </Typography.Text>
-                                        </Col>))}
-                                    </Row>
+                                    <div>
+                                        <Row align="top">
+                                            <Typography.Text strong style={{
+                                                fontSize: 14,
+                                                fontFamily: "Roboto",
+                                            }}>{task.title}</Typography.Text>
+                                        </Row>
+                                        <Row align="bottom" justify="space-between">
+                                            <Col>
+                                                <Typography.Text style={{fontSize: 12, fontFamily: "Roboto"}}>
+                                                    {task.expertise.length === 0 
+                                                    ?
+                                                        null
+                                                    : 
+                                                        <Col style={{marginLeft:'0px', marginBottom:'10px', fontFamily:'Roboto', fontSize:'12px', borderRadius:'3px', backgroundColor:'rgb(245, 245, 245)', color:'rgb(89, 89, 89)', padding:'3px', paddingLeft:'5px', paddingRight:'5px', alignSelf:'start'}}>{task.category.name + ' ' + '(' + task.expertise.map((exp, index) => index === 0 ? exp.name : ' ' + exp.name  )+ ')'}</Col>
+                                                    }
+                                                </Typography.Text>
+                                            </Col>
+                                        </Row>
+                                    </div>
                                 </Row>
                             </Col>
                         </Row>

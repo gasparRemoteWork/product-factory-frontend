@@ -259,7 +259,7 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
                                 <Typography.Text strong>Bio</Typography.Text>
                             </Row>
                             <Row style={{marginBottom: 30}}>
-                                <Input.TextArea autoSize={true} style={{width: 460, min_height: 200}} rows={4}
+                                <Input.TextArea autoSize={true} style={{width: 460, minHeight: 200}} rows={4}
                                                 value={bio} placeholder={"Bio"}
                                                 onChange={(e) => setBio(e.target.value)}/>
                             </Row>

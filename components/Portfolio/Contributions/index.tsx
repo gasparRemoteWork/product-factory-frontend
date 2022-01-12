@@ -41,7 +41,7 @@ const Contributions = ({tasks, changePage, pagesNumber, activePage, hasNext, has
     }
 
     return (
-        <div>
+        <div style={{width:'70%'}}>
             <Row>
                 <Typography.Text style={{
                     fontSize: 16,

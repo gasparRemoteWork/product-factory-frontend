@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-
 import {Row, Avatar} from 'antd'
 import {getInitialName} from '../../utilities/utils'
 import {USER_TYPES} from '../../graphql/types'

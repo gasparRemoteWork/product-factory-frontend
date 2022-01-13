@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Avatar} from 'antd';
-import {getInitialName} from '../../utilities/utils';
+import {useQuery} from "@apollo/react-hooks";
+import {GET_PERSON_INFO} from "../../graphql/queries";
 import Link from "next/link";
-
+import {apiDomain} from "../../utilities/constants";
 
 interface ICustomAvatar2Props {
   person: {
@@ -12,25 +13,38 @@ interface ICustomAvatar2Props {
   size?: number
 }
 
-const CustomAvatar2: React.FunctionComponent<ICustomAvatar2Props> = ({person, size = 40}) => {
+export const CustomAvatar2 = ({person, size = 40}:ICustomAvatar2Props) => {
+  
+  const personSlug = person.slug
+  const {data: profileData} = useQuery(GET_PERSON_INFO, {variables: {personSlug}})
+
+  const [profile, setProfile] = useState<any>({
+      id: '',
+      firstName: '',
+      bio: '',
+      slug: '',
+      avatar: '',
+      skills: [],
+      websites: [],
+      websiteTypes: []
+  });
+
+  useEffect(() => {
+    if (profileData?.personInfo) {
+        setProfile(profileData.personInfo);
+    }
+  }, [profileData]);
+  
+  
   return (
     <Link href={`/${person.slug}`}>
-      <Avatar
-        size={size}
+      <Avatar size={size} 
         style={{
           marginRight: size >= 100 ? 40 : 5,
-          background: 'linear-gradient(140deg, #F833CD, #1734CC)',
-          borderRadius: 100,
-          textAlign: 'center',
           lineHeight: `${size}px`,
-          color: 'white',
-          fontSize: size >= 100 ? '3rem' : '1rem',
           userSelect: 'none',
           cursor: 'pointer'
-        }}
-      >
-        {person.firstName && getInitialName(person.firstName)}
-      </Avatar>
+          }} src={apiDomain + profile.avatar}/>
     </Link>
   )
 }

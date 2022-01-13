@@ -82,7 +82,6 @@ const commentGetType = {
 };
 
 
-
 const CommentContainer: React.FunctionComponent<ICommentContainerProps> = ({comments, submit, objectType, loginUrl, registerUrl}) => {
   const [users, setUsers] = useState<IUser[]>([]);
   const cType = commentCreateType[objectType];
@@ -174,7 +173,6 @@ const CommentContainer: React.FunctionComponent<ICommentContainerProps> = ({comm
       setCommentText(val);
     }
 
-
   return (
     <>
       {
@@ -184,7 +182,7 @@ const CommentContainer: React.FunctionComponent<ICommentContainerProps> = ({comm
             actions={[<span key="comment-nested-reply-to"
                             onClick={() => openSendSubCommentModal(comment.id)}>Reply to</span>]}
             author={<Link href={`/${comment.data.person.slug}`}>{comment.data.person.firstName}</Link>}
-            avatar={<CustomAvatar2 person={comment.data.person}/>}
+            avatar={ <CustomAvatar2 person={comment.data.person}/>}
             content={<CommentsText text={comment.data.text}/>}
           >
             <CommentContainer comments={getProp(comment, "children", [])}

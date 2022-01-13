@@ -4,7 +4,7 @@ import {useQuery} from '@apollo/react-hooks';
 import {GET_PRODUCT_PERSONS} from '../../../../graphql/queries';
 import {getProp} from '../../../../utilities/filters';
 import {randomKeys} from '../../../../utilities/utils';
-import {CustomAvatar} from '../../../../components';
+import {CustomAvatar2} from '../../../../components/CustomAvatar2';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
 import {Social} from "../../../../components/Profile/ProfileTop";
 import Link from "next/link";
@@ -16,12 +16,13 @@ import Head from "next/head";
 const peopleData = (data: any) => {
   return data.length > 0 ? data.map((person: any, index: number) => {
     const socials = getProp(person, 'personsocialSet', []);
+    
     return (
       <div key={`person-${index}`} className="product-list-item">
         <Row>
           <Col xs={24}>
             <Row wrap={false}>
-              {CustomAvatar(person, 'firstName', 64)}
+              {<CustomAvatar2 person={person} size={60} />}
               <div style={{paddingLeft: 10}}>
                 <Row>
                   <Typography.Text
@@ -94,7 +95,7 @@ const PeopleList: React.FunctionComponent = () => {
             {
               getProp(data, 'productRoles', []).map((role: any, idx: number) => (
                 <React.Fragment key={randomKeys()}>
-                  {CustomAvatar(role.person, "firstName", 64, role)}
+                  {<CustomAvatar2 person={role.person} size={60} />}
                   {
                     idx !== data.productRoles.length - 1 ? <Divider/> : null
                   }

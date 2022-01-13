@@ -13,7 +13,7 @@ interface ICustomAvatar2Props {
   size?: number
 }
 
-export const CustomAvatar2 = ({person, size = 40}:ICustomAvatar2Props) => {
+export const CustomAvatar2 = ({person, size = 35}:ICustomAvatar2Props) => {
   
   const personSlug = person.slug
   const {data: profileData} = useQuery(GET_PERSON_INFO, {variables: {personSlug}})

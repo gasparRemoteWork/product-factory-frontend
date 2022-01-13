@@ -423,8 +423,8 @@ const Task: React.FunctionComponent<Params> = ({
                             <Row style={{marginTop: 10}} className="text-sm mt-8">
                                 <strong className="my-auto">Assigned to: </strong>
                                 <Row align="middle" style={{marginLeft: 15}}>
-                                    <Col style={{marginRight:'5px'}}>
-                                        <Avatar/>
+                                    <Col>
+                                        <CustomAvatar2 person={{firstName: getProp(assignee, "firstName", ""),slug: getProp(assignee, "slug", "")}}/>
                                     </Col>
                                     <Col>
                                         <Typography.Link

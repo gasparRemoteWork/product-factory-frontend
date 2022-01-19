@@ -23,19 +23,14 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
                                     ?
                                         null
                                     : 
-                                        <Col style={{marginLeft:'0px', marginBottom:'10px', fontFamily:'Roboto', fontSize:'12px', borderRadius:'3px', backgroundColor:'rgb(245, 245, 245)', color:'rgb(89, 89, 89)', padding:'3px', paddingLeft:'5px', paddingRight:'5px', alignSelf:'start'}}>{task.category.name + ' ' + '(' + task.expertise.map((exp, index) => index === 0 ? exp.name : ' ' + exp.name  )+ ')'}</Col>
+                                        <Col className="expertises">{task.category.name + ' ' + '(' + task.expertise.map((exp, index) => index === 0 ? exp.name : ' ' + exp.name  )+ ')'}</Col>
                                     }
                                 </Typography.Text>
                             </Col>
                         </Row>
                         <Row justify={"space-between"} align={"middle"}>
                             <Col style={{marginLeft: 30}}>
-                                <Typography.Text style={{
-                                    fontSize: 14,
-                                    fontFamily: "Roboto",
-                                    color: "rgba(0, 0, 0, 0.45)",
-                                    marginRight: 9
-                                }}>
+                                <Typography.Text className="days-ago">
                                     {task.date} days ago
                                 </Typography.Text>
                             </Col>
@@ -44,12 +39,7 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
                                     padding: 0,
                                     border: "none"
                                 }} onClick={() => openTaskDetail(index)}>
-                                    <Typography.Text style={{
-                                        textDecoration: "underline #1D1D1B",
-                                        color: "#1D1D1B",
-                                        fontSize: 14,
-                                        fontFamily: "Roboto",
-                                    }}>View Delivery Details</Typography.Text></Button>
+                                    <Typography.Text className="delivery-details">View Delivery Details</Typography.Text></Button>
                             </Col>
                         </Row>
                     </Col>

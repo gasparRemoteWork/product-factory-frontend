@@ -54,7 +54,7 @@ const TaskTab: React.FunctionComponent<Props> = ({
         statusList={TASK_TYPES}
         showInitiativeName={showInitiativeName}
         showProductName={showProductName}
-        hideTitle={true}
+        hideEmptyList={true}
       />
       <FilterModal
         modal={filterModal}

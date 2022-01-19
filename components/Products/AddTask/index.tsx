@@ -139,7 +139,7 @@ const AddTask: React.FunctionComponent<Props> = (
         loading: initiativeLoading,
         refetch: fetchInitiatives
     } = useQuery(GET_INITIATIVES_SHORT, {
-        variables: {productSlug}
+        variables: {productSlug, status: 1}
     });
     const {data: capabilitiesData, loading: capabilitiesLoading} = useQuery(GET_CAPABILITIES_BY_PRODUCT, {
         variables: {productSlug}

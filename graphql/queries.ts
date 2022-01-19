@@ -249,8 +249,8 @@ export const GET_INITIATIVES = gql`
 
 
 export const GET_INITIATIVES_SHORT = gql`
-  query GetInitiatives($productSlug: String) {
-    initiatives(productSlug: $productSlug) {
+  query GetInitiatives($productSlug: String, $status: Int) {
+    initiatives(productSlug: $productSlug,status: $status) {
       id
       name
     }

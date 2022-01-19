@@ -136,7 +136,6 @@ const ProfileItem: React.FunctionComponent = () => {
                            style={{marginLeft: 5}}>{getProp(review, 'review.review.product.name', '')}</a>
                       </Link>
                     </Row>
-
                     {
                       initiative && (
                         <Row style={{marginBottom: 3}}>

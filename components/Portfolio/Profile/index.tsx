@@ -6,33 +6,49 @@ import {useRouter} from "next/router";
 import {connect} from "react-redux";
 import {apiDomain} from "../../../utilities/constants";
 
+
 function ExpertiseSkills({skill}) {
-    if(typeof(skill) === 'string'){
-        return <Col style={{marginLeft:'5px', marginBottom:'10px', borderRadius:'3px', fontSize:'12px', fontFamily:'Roboto', backgroundColor:'rgb(245, 245, 245)', color:'rgb(89, 89, 89)', padding:'3px', paddingLeft:'5px', paddingRight:'5px', alignSelf:'start'}}>{skill}</Col> 
+    if(skill.subcategory){
+        return <Col className="expertises_sub">{skill.value}</Col> 
     }
     else {
-        return <Col style={{marginLeft:'0px', marginBottom:'10px', borderRadius:'3px', fontSize:'12px', fontFamily:'Roboto', backgroundColor:'rgb(245, 245, 245)', color:'rgb(89, 89, 89)', padding:'3px', paddingLeft:'0px', paddingRight:'5px', alignSelf:'start'}}>({skill.map((expertise, index) => index < (skill.length - 1) ? expertise + ', ' : expertise)})</Col> 
+        return <Col className="expertises">{skill.value}</Col>
     }
 }
 
 //This method return only the unique categories and expertises, and put together a categorie string with their respective expertises
 const getUniqCategoryExpertise = (profileSkills) => {
-    let uniq_category_expertise = [] 
 
+    let uniq_category_expertise = [] 
+    const arrayForSort = [...profileSkills]
+    profileSkills = arrayForSort.sort((a:any, b:any) => a.category[0].localeCompare(b.category[0]));
+    
     profileSkills.map((skill) => {
-        let expertises = []
         skill.category.map((category, index) => {
-            const findCategory = uniq_category_expertise.filter((el) => el === category)
-            if(findCategory.length == 0 && index < (skill.category.length - 1)) {
-                uniq_category_expertise.push(category)
+            const findCategory = uniq_category_expertise.filter((el) => el.value === category)
+            if(findCategory.length == 0) {
+                if (index < (skill.category.length - 1)) {
+                    uniq_category_expertise.push({
+                                                    subcategory:false,
+                                                    value:category
+                                                 })
+                }
+                else {
+                    if (skill.expertise) {
+                        uniq_category_expertise.push({
+                                                        subcategory:true,
+                                                        value:category + ' (' + skill.expertise.join(', ') + ') '
+                                                     })
+                    }
+                    else {
+                        uniq_category_expertise.push({
+                                                        subcategory:true,
+                                                        value:category
+                                                     })
+                    }   
+                }
             }
         })
-        skill.expertise && skill.expertise.map((expertise) => {
-            expertises.push(expertise)
-        })
-        if(expertises.length > 0){
-            uniq_category_expertise.push(skill.category[skill.category.length -1 ] + ' (' + expertises.join(', ') + ') ')
-        }
     })
 
     return uniq_category_expertise;
@@ -52,15 +68,7 @@ const Profile = ({profile, user, refetchProfile}: ProfileProps) => {
     let uniqCategoryExpertise = getUniqCategoryExpertise(profile.skills)
 
     return (
-        <div style={{
-            border: " 1px solid #E7E7E7",
-            borderRadius: 15,
-            padding: 14,
-            width: 300,
-            marginRight: 10,
-            marginBottom: 20,
-            height: "max-content"
-        }}>
+        <div className="portfolio-profile" >
             <Row style={{position: 'relative'}}>
                 <Col style={{width: '100%'}}>
                     <Row justify="center">

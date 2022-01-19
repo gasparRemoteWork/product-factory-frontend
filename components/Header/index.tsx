@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
-import {Avatar, Button, message, Row, Col, Menu, Dropdown} from "antd";
+import {Button, message, Row, Col, Menu, Dropdown, notification} from "antd";
+import {Avatar} from "antd";
 import {setLoginURL, setRegisterURL, userLogInAction} from "../../lib/actions";
 import {UserState} from "../../lib/reducers/user.reducer";
 // @ts-ignore
@@ -17,6 +18,8 @@ import {LOGOUT} from "../../graphql/mutations";
 import {MenuOutlined, DownOutlined, LogoutOutlined, UserOutlined, BookOutlined} from "@ant-design/icons";
 import {apiDomain} from "../../utilities/constants";
 import {ProfileType} from "../../components/Portfolio/interfaces";
+
+import { useCookies } from 'react-cookie';
 
 const redirectToLocalName = "redirectTo";
 
@@ -58,6 +61,42 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
             setPersonData(updatedData);
         }
     }
+
+    const [cookies, setCookie] = useCookies(['cookie_consent']);
+
+    const showCookiePopup = () => {
+        const key = `open${Date.now()}`;
+        const confirmBtn = (
+            <Button type="primary" size="small" 
+                onClick={() => {
+                    setCookie('cookie_consent', true, { path: '/' }); 
+                    notification.close(key)}
+            }>I accept!</Button>
+        );
+
+        notification.open({
+            message: <b>Your Privacy</b>,
+            description:
+                <>
+                    <p>OpenUnited uses cookies for security.</p>
+                    <p>All cookies in use are essential.</p>
+                    <p>
+                        For more information, you may wish to 
+                        read our <a href="https://openunited.com/privacy-policy" target="_blank">privacy policy</a>.
+                    </p>
+                </>,                
+            duration: 0,
+            btn: confirmBtn,
+            key: key,
+        });
+    };
+
+    useEffect(() => {
+        notification.config({maxCount: 1});
+
+        if(!cookies.cookie_consent)
+            showCookiePopup();
+    }, []);
 
     const menu = (
         <Menu style={{minWidth: 150}}>
@@ -282,7 +321,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                                         user && user.isLoggedIn ? (
                                             <Dropdown overlay={menu} placement="bottomRight" className="ml-15">
                                                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                                                    <Avatar size={35} style={{marginRight:'5px'}} icon={<UserOutlined/>} src={apiDomain + profile != null ? profile.avatar : ''}/>
+                                                    <Avatar size={35} style={{marginRight:'5px'}} icon={<UserOutlined/>} src={profile ? profile.avatar : ''}/>
                                                     <strong className="text-grey-9">{user.username}</strong>
                                                     <DownOutlined className="text-grey-9 ml-5"/>
                                                 </a>

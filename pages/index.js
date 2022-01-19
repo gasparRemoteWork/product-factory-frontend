@@ -5,6 +5,7 @@ import ContainerFlex from "../components/ContainerFlex";
 import { Layout } from "antd";
 import Footer from "../components/Footer";
 import Head from "next/head";
+import { CookiesProvider } from 'react-cookie';
 
 function Home() {
   return (
@@ -23,9 +24,11 @@ function Home() {
         />
       </Head>
       <Layout style={{ minHeight: "100vh" }}>
-        <Header />
-        <Dashboard />
-        <Footer />
+        <CookiesProvider>
+          <Header />
+          <Dashboard />
+          <Footer />
+        </CookiesProvider>
       </Layout>
     </ContainerFlex>
   );

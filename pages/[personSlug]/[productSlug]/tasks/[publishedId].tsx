@@ -55,7 +55,6 @@ import Head from "next/head";
 import ToReviewModal from "../../../../components/Products/ToReviewModal";
 import {UploadFile} from "antd/es/upload/interface";
 import DeliveryMessageModal from "../../../../components/Products/DeliveryMessageModal";
-import Avatar from "antd/lib/avatar/avatar";
 
 const {Panel} = Collapse;
 

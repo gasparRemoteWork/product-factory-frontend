@@ -276,7 +276,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                 <Col xl={20} lg={22}>
                     <Row className="container" style={{height:'40px'}}>
                         <Col span={9}>
-                            <Row justify="start" align="middle">
+                            <Row justify="start" align="middle" className="header_menu_left">
                                 <Col style={{marginRight: 20}}>
                                     <Link href="/">
                                         <a className="gray-link">
@@ -285,7 +285,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                                     </Link>
                                 </Col>
                                 {(user && user.isLoggedIn) && (
-                                    <Col style={{marginRight: 20}}>
+                                    <Col style={{marginRight: 20}}>   
                                         <Link href="/product/add">
                                             <a className="gray-link">
                                                 Add Product
@@ -304,7 +304,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                         </Col>
 
                         <Col span={6}>
-                            <Row justify="center">
+                            <Row justify="center" className="header_logo_center" >
                                     <Link href="/">
                                         <a>
                                             <img src={Logo} alt="logo"/>
@@ -315,7 +315,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                         </Col>
 
                         <Col span={9}>
-                            <Row align="middle" justify="end">
+                            <Row align="middle" justify="end" className="header_menu_right">
                                 <Col>
                                     {
                                         user && user.isLoggedIn ? (

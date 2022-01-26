@@ -6,15 +6,15 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
     return (
         <>
             {tasks.map((task, index) => (
-                <Row key={index} style={{minWidth: 350,marginBottom: 10}}>
-                    <Col style={{minWidth: 350}}>
+                <Row key={index} style={{minWidth: 350, marginBottom: 10}}>
+                    <Col style={{minWidth: 350, width:'100%'}}>
                         <Row justify={"start"} align={"middle"} style={{flexWrap: "nowrap"}}>
                             <Avatar size={32} shape="circle" src={task.product.avatar}/>
                             <Typography.Text strong style={{
                                 fontSize: 14,
                                 fontFamily: "Roboto",
                                 marginLeft: 5
-                            }}>{task.title}</Typography.Text>
+                            }}>{task.title.length > 50 ? task.title.slice(0,50).concat('...') : task.title}</Typography.Text>
                         </Row>
                         <Row align={"middle"} justify={"space-between"}>
                             <Col style={{marginLeft:'10px', marginTop:'10px'}}>
@@ -37,6 +37,7 @@ const TasksMobile = ({tasks, openTaskDetail}: TasksComponentProps) => {
                             <Col>
                                 <Button style={{
                                     padding: 0,
+                                    paddingRight:'10px',
                                     border: "none"
                                 }} onClick={() => openTaskDetail(index)}>
                                     <Typography.Text className="delivery-details">View Delivery Details</Typography.Text></Button>

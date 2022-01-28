@@ -629,6 +629,11 @@ p:last-child {
     border-radius: 10px!important;
 }
 
+.contributions_tasks {
+    width:70%;
+    min-width: 350px;
+}
+
 .tasks-desktop {
     display: block;
 }
@@ -637,7 +642,18 @@ p:last-child {
     display: none;
 }
 
+@media screen and (max-width: 1200px) {
+    .contributions_tasks {
+        margin: auto;
+        width:100%;
+    }
+}
+
 @media screen and (max-width: 700px) {
+    .contributions_tasks {
+        width:100%;
+    }
+
     .tasks-desktop {
         display: none;
     }

@@ -20,8 +20,8 @@ const TaskTab: React.FunctionComponent<Props> = ({
   setFilterModal,
 }) => {
   const [inputData, setInputData] = useState({
-    sortedBy: "priority",
-    statuses: [2],
+    sortedBy: "status",
+    statuses: [],
     tags: [],
     priority: [],
     categories: [],

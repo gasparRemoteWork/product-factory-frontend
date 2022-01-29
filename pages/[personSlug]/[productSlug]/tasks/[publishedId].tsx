@@ -416,11 +416,11 @@ const Task: React.FunctionComponent<Params> = ({
                     <>
                         {assignee.id === user.id ? (
                             <div className="flex-column">
-                                <strong className="my-auto">Assigned to you</strong>
+                                <strong className="my-auto">Claimed by you</strong>
                             </div>
                         ) : (
                             <Row style={{marginTop: 10}} className="text-sm mt-8">
-                                <strong className="my-auto">Assigned to: </strong>
+                                <strong className="my-auto">Claimed by: </strong>
                                 <Row align="middle" style={{marginLeft: 15}}>
                                     <Col>
                                         <CustomAvatar2 person={{firstName: getProp(assignee, "firstName", ""),slug: getProp(assignee, "slug", "")}}/>

@@ -122,6 +122,7 @@ export const GET_TASKS = gql`
       }
       task {
         id
+        priority
       }
       reviewer {
         firstName
@@ -445,6 +446,7 @@ export const GET_TASKS_BY_PRODUCT = gql`
       }
       task {
         id
+        priority
       }
       reviewer {
         firstName

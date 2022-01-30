@@ -88,6 +88,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
             duration: 0,
             btn: confirmBtn,
             key: key,
+            placement: 'bottomRight'
         });
     };
 

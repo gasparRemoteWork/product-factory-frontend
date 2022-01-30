@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {EditProfileProps, ProfileType, Website} from "../interfaces";
 import {Category, Skill, SkillExpertise} from "../../SkillsComponents/interfaces";
-import {Avatar, Button, Col, Input, message, Row, Select, Typography, Upload} from "antd";
+import {Avatar, Button, Col, Input, message, Row, Select, Typography, Upload, Checkbox} from "antd";
 import {UploadFile} from "antd/es/upload/interface";
 import {useRouter} from "next/router";
 import 'antd/es/modal/style';
@@ -34,7 +34,7 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
     const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [allExpertises, setAllExpertises] = useState([]);
     const [skillExpertise, setSkillExpertise] = useState<SkillExpertise[]>([]);
-
+    const [sendMeChallenges, setSendMeChallenges] = useState<boolean>(profile.preferences ? profile.preferences.sendMeChallenges : true);
     const {data: categories} = useQuery(GET_CATEGORIES_LIST);
     const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
     const [deleteAvatar] = useMutation(DELETE_AVATAR, {
@@ -92,6 +92,7 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
             setAvatarUrl(profile.avatar);
             setFileList([]);
             setSkills(profile.skills);
+            setSendMeChallenges(profile.preferences ? profile.preferences.sendMeChallenges : true);    
             const currentSkillExpertise: SkillExpertise[] = [];
             profile.skills.map(skill => {
                 var expertiseSelections = []
@@ -179,7 +180,10 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
             bio,
             skills: newSkills,
             websites: newWebsites,
-            avatar: avatarId
+            avatar: avatarId,
+            preferences: {
+                sendMeChallenges: sendMeChallenges
+            }
         }
         updateProfile({variables: variables}).then();
     }
@@ -345,6 +349,9 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
                                     website</Button>
                             </Row>
                         </Col>
+                    </Row>
+                    <Row style={{marginBottom: 35}}>
+                        <Checkbox checked={sendMeChallenges} onChange={(e) => setSendMeChallenges(e.target.checked)}>Send me relevant challenges that match my skills and expertises</Checkbox>
                     </Row>
                     <Row justify={"start"}>
                         <Button type={"primary"} style={{width: 108, height: 33, marginRight: 20}}

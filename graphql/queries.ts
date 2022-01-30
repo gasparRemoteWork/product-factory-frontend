@@ -1014,6 +1014,9 @@ export const GET_PERSON_INFO = gql `
         website
       }
       websiteTypes
+      preferences {
+        sendMeChallenges
+      }
     }
   }
 `;

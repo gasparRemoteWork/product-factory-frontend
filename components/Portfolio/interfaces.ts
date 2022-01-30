@@ -9,6 +9,7 @@ export interface ProfileType {
     skills: any[]
     websites: Website[]
     websiteTypes: string[]
+    preferences: Preference
 }
 
 export interface Product {
@@ -136,4 +137,8 @@ export interface SkillsAreaInterface {
     setExpertiseList: Function
     skillExpertise: SkillExpertise[]
     setSkillExpertise: Function
+}
+
+export interface Preference {
+    sendMeChallenges: boolean
 }

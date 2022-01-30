@@ -12,9 +12,9 @@ interface IProps {
   canEdit: boolean,
 }
 
-const Priorities: React.FunctionComponent<IProps> = ({task:taskListing, submit, canEdit = false}) => {
-  const currentPriority = getProp(taskListing, 'priority', '');
-  const taskId = getProp(taskListing.task, 'id', 0);
+const Priorities: React.FunctionComponent<IProps> = ({task, submit, canEdit = false}) => {
+  const currentPriority = getProp(task, 'priority', '');
+  const taskId = getProp(task?.task || task, 'id', 0);
   const otherPriorities = ['High', 'Medium', 'Low'].filter(priority => priority != currentPriority);
 
   const [changeTaskPriority] = useMutation(CHANGE_TASK_PRIORITY, {

@@ -28,7 +28,7 @@ type Props = {
 };
 
 const TaskTableTiles: React.FunctionComponent<Props> = ({
-  tasks,
+  tasks: taskListings,
   statusList = TASK_CLAIM_TYPES,
   hideEmptyList = false,
   showInitiativeName = false,
@@ -44,7 +44,7 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
   const [modalVideoUrl, setModalVideoUrl] = useState("");
   const [showModalVideo, setShowModalVideo] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const curTasks = tasks.slice(
+  const curTaskListings = taskListings.slice(
     current * pagesize - pagesize,
     current * pagesize
   );
@@ -62,12 +62,12 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
   return (
     <>
       <Row gutter={20}>
-        {curTasks && curTasks.length > 0 ? (
+        {curTaskListings && curTaskListings.length > 0 ? (
           <>
-            {curTasks.map((task: any, index: number) => {
-              const status = getProp(task, "status");
+            {curTaskListings.map((taskListing: any, index: number) => {
+              const status = getProp(taskListing, "status");
               let taskStatus = statusList[status];
-              const hasActiveDepends = getProp(task, "hasActiveDepends", false);
+              const hasActiveDepends = getProp(taskListing, "hasActiveDepends", false);
 
               if (hasActiveDepends) {
                 taskStatus = "Blocked";
@@ -75,17 +75,17 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
                 taskStatus = "Available";
               }
 
-              const productName = getProp(task, "product.name", "");
-              const productSlug = getProp(task, "product.slug", "");
-              const productVideoUrl = getProp(task, "product.videoUrl", "");
-              const initiativeName = getProp(task, "initiative.name", "");
-              const initiativeId = getProp(task, "initiative.id", "");
-              const initiativeVideoUrl = getProp(task, "initiative.videoUrl", "");
-              const taskVideoUrl = getProp(task, "videoUrl", "");
-              const assignee = getProp(task, "assignedToPerson", null);
-              const owner = getProp(task, "product.owner", "");
+              const productName = getProp(taskListing, "product.name", "");
+              const productSlug = getProp(taskListing, "product.slug", "");
+              const productVideoUrl = getProp(taskListing, "product.videoUrl", "");
+              const initiativeName = getProp(taskListing, "initiative.name", "");
+              const initiativeId = getProp(taskListing, "initiative.id", "");
+              const initiativeVideoUrl = getProp(taskListing, "initiative.videoUrl", "");
+              const taskVideoUrl = getProp(taskListing, "videoUrl", "");
+              const assignee = getProp(taskListing, "assignedToPerson", null);
+              const owner = getProp(taskListing, "product.owner", "");
               const canEdit = hasManagerRoots(getUserRole(roles, productSlug));
-              const reviewer = getProp(task, "reviewer", null);
+              const reviewer = getProp(taskListing, "reviewer", null);
 
               return (
                 <Col key={index} md={gridSizeMd} lg={gridSizeLg} sm={gridSizeSm} className="task-box">
@@ -94,19 +94,19 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
                           <PlaySquareOutlined className="pointer mr-10"
                                               onClick={() => showVideoModal(taskVideoUrl)} />}
                     <Link
-                      href={`/${owner}/${productSlug}/tasks/${task.publishedId}`}
+                      href={`/${owner}/${productSlug}/tasks/${taskListing.publishedId}`}
                     >
-                      {task.title}
+                      {taskListing.title}
                     </Link>
                   </div>
                   <div className="task-box-body">
-                    {task.shortDescription && (
-                      <p className="omit">{task.shortDescription}</p>
+                    {taskListing.shortDescription && (
+                      <p className="omit">{taskListing.shortDescription}</p>
                     )}
-                    {task.stacks && task.stacks.length > 0 && (
+                    {taskListing.stacks && taskListing.stacks.length > 0 && (
                       <span>
                         <b className="mr-20">Required Skills</b>
-                        {task.stacks.map((tag: any) => (
+                        {taskListing.stacks.map((tag: any) => (
                           <Tag key={tag} color="default">
                             {tag}
                           </Tag>
@@ -152,7 +152,7 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
 
                     <div className="task-box-video">
                       <b className="mr-15">Priority</b>
-                      <Priorities task={task}
+                      <Priorities task={taskListing.task}
                                   submit={() => submit()}
                                   canEdit={canEdit} />
                     </div>
@@ -193,11 +193,11 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
           )
         )}
       </Row>
-      {tasks && tasks.length > pagesize && (
+      {taskListings && taskListings.length > pagesize && (
         <div className="center mb-30">
           <Pagination
             current={current}
-            total={tasks.length}
+            total={taskListings.length}
             onChange={setCurrent}
             pageSize={pagesize}
             showSizeChanger={false}

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Row, Typography} from "antd";
+import {Button, Row, Typography, Checkbox} from "antd";
 import {SecondStepProps} from "../interfaces";
 import {LeftOutlined} from "@ant-design/icons";
 import SkillsSelect from "../Skills/SkillsSelect";
@@ -13,7 +13,9 @@ const SecondStep = ({
                         setSkills,
                         skillExpertise,
                         setSkillExpertise,
-                        skills
+                        skills,
+                        sendMeChallenges,
+                        setSendMeChallenges
                     }: SecondStepProps) => {
 
     const finish = () => {
@@ -51,6 +53,9 @@ const SecondStep = ({
             </Row>
             <Row style={{marginBottom: 35}}>
                 <ExpertiseTable skillExpertise={skillExpertise} setSkills={setSkills} skills={skills}/>
+            </Row>
+            <Row style={{marginBottom: 35}}>
+                <Checkbox checked={sendMeChallenges} onChange={(e) => setSendMeChallenges(e.target.checked)}>Send me relevant challenges that match my skills and expertises</Checkbox>
             </Row>
             <Row justify={"space-between"}>
                 <Button style={{border: "none"}} icon={<LeftOutlined/>} onClick={() => previous(0)}

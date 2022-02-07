@@ -30,6 +30,7 @@ const CreatePersonModal = ({modal, closeModal}: CreatePersonProps) => {
     const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [allExpertises, setAllExpertises] = useState([]);
     const [skillExpertise, setSkillExpertise] = useState<SkillExpertise[]>([]);
+    const [sendMeChallenges, setSendMeChallenges] = useState<boolean>(true);
 
     const {data: categories} = useQuery(GET_CATEGORIES_LIST);
     const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
@@ -70,7 +71,7 @@ const CreatePersonModal = ({modal, closeModal}: CreatePersonProps) => {
     });
 
     const submit = () => {
-        createProfile({variables: {firstName, lastName, bio, skills, avatar: avatarId}});
+        createProfile({variables: {firstName, lastName, bio, skills, avatar: avatarId, preferences: {sendMeChallenges: sendMeChallenges}}});
     }
 
 
@@ -97,6 +98,8 @@ const CreatePersonModal = ({modal, closeModal}: CreatePersonProps) => {
                     allCategories={allCategories}
                     allExpertises={allExpertises}
                     skills={skills}
+                    sendMeChallenges={sendMeChallenges}
+                    setSendMeChallenges={setSendMeChallenges}
         />
     ]
 

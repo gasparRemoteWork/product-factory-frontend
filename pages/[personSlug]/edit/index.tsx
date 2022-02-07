@@ -28,7 +28,8 @@ const EditPerson = (user: any) => {
         avatar: '',
         skills: [],
         websites: [],
-        websiteTypes: []
+        websiteTypes: [],
+        preferences: null
     });
     const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
     const [redirect, setRedirect] = useState<boolean>(false);

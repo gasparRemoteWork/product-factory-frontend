@@ -42,6 +42,8 @@ export interface SecondStepProps {
     skillExpertise: SkillExpertise[]
     setSkillExpertise: Function
     skills: Skill[]
+    sendMeChallenges: boolean
+    setSendMeChallenges: Function
 }
 
 export interface StepSwitcherProps {

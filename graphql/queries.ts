@@ -951,6 +951,10 @@ export const GET_CONTRIBUTOR_GUIDES = gql`
       id
       title
       description
+      category {
+        id
+        name
+      }
     }
   }
 `;

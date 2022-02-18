@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Modal, Select, Form, Typography, Input, message} from 'antd';
+import {Modal, Select, Form, Typography, Input, message, TreeSelect} from 'antd';
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import {connect} from "react-redux";
 import {WorkState} from "../../lib/reducers/work.reducer";
@@ -7,20 +7,27 @@ import RichTextEditor from "../RichTextEditor";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import "./style.less";
 import {UPDATE_CONTRIBUTION_GUIDE, CREATE_CONTRIBUTION_GUIDE} from "../../graphql/mutations";
+import { GET_CATEGORIES_LIST } from "../../graphql/queries";
 
 const { Option } = Select;
+const {TreeNode} = TreeSelect;
+
+interface Category {
+  active: boolean,
+  selectable: boolean,
+  name: string,
+  children: Category[]
+}
 
 type Props = {
   modal: boolean;
   closeModal: (updateGuides?: boolean) => void;
-  stacks: any[],
-  saveStacks: Function,
   productSlug?: string,
   item: null | {
     id?: string,
     title: string,
-    stack: { id: string, name: string }[],
-    description: string
+    description: string,
+    category: Category
   }
 };
 
@@ -28,10 +35,40 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
   modal,
   closeModal,
   item,
-  stacks,
   productSlug,
-  saveStacks,
 }) => {
+  const [allCategories, setAllCategories] = React.useState([]);
+  const [category, setCategory] = useState("");
+  const {data: categories} = useQuery(GET_CATEGORIES_LIST);
+
+  const makeCategoriesTree = (categories: Category[]) => {
+    return categories.map((category, index) => (
+        <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+            {category.children ? makeCategoriesTree(category.children) : null}
+        </TreeNode>));
+  }
+
+  useEffect(() => {
+    if (categories?.taskCategoryListing) {
+        setAllCategories(JSON.parse(categories.taskCategoryListing));
+    }
+  }, [categories]);
+
+  const findCategory = (categories: Category[], value: string, parent: Category): Category | undefined => {
+    for (let category of categories) {
+        if (category.children && category.children.length > 0) {
+            const skill = findCategory(category.children, value, category);
+            if (skill) {
+                return skill;
+            }
+        } else if (category.name === value) {
+            category['parent'] = parent;
+            return category;
+        }
+    }
+  }
+
+
   const [form] = Form.useForm()
   const handleCancel = () => {
     closeModal();
@@ -42,8 +79,8 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
   let initialForm = {
     title: "",
     description: "",
+    category: "",
   };
-
 
   const [createGuide] = useMutation(CREATE_CONTRIBUTION_GUIDE, {
     onCompleted(res) {
@@ -83,7 +120,7 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
       form.setFields([
         {name: "title", value: item.title},
         {name: "description", value: item.description},
-        {name: "stacks", value: item.stack.map(s => s.id)}
+        {name: "category", value: item.category.name},
       ]);
       setDescription(item.description)
     }
@@ -101,7 +138,7 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
     const input = {
       description,
       title: values.title,
-      stacks: values.stacks,
+      category: values.category ? findCategory(allCategories, values.category, null).id : "",
       productSlug
     };
     if (item) {
@@ -151,18 +188,17 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
                             onChangeHTML={setDescription}
                             clear={longDescriptionClear} />
           </Form.Item>
-          <Form.Item name="stacks" label="Skills">
-            <Select
-              placeholder="Specify skills"
-              mode="multiple"
-              showSearch={true}
-              filterOption={filterOption}
-              allowClear
+          <Form.Item name="category" label="Guide Category">
+            <TreeSelect
+                allowClear
+                onChange={setCategory}
+                placeholder="Select category"
+                value={category}
             >
-              {stacks.map((tag: {id: string, name: string}) =>
-                <Option key={tag.id} value={tag.id}>{tag.name}</Option>)}
-            </Select>
+                {allCategories && makeCategoriesTree(allCategories)}
+            </TreeSelect>
           </Form.Item>
+
         </Form>
       </Modal>
     </>

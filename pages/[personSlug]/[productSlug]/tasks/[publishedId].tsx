@@ -494,22 +494,26 @@ const Task: React.FunctionComponent<Params> = ({
                                 <Button type="primary" onClick={() => claimTaskEvent()}>
                                     Claim the task
                                 </Button>
-                                <a style={{textAlign: 'center', marginTop: '5px', fontSize: '13px'}} 
+                                {contributionGuide && (
+                                <>
+                                    <a style={{textAlign: 'center', marginTop: '5px', fontSize: '13px'}} 
                                     href='#' onClick={() => showCotributionGuide()}>Contribution guide</a>
 
-                                <Modal 
-                                    title="Contribution Guide" 
-                                    visible={isContributionGuideVisible} 
-                                    onOk={handleContributionGuideOk} 
-                                    onCancel={handleContributionGuideCancel}
-                                    footer={[
-                                        <Button key="submit" type="primary" onClick={handleContributionGuideOk}>
-                                          Ok
-                                        </Button>,
-                                      ]}
-                                >
-                                    {parse(contributionGuide.description)}                                
-                                </Modal>
+                                    <Modal 
+                                        title="Contribution Guide" 
+                                        visible={isContributionGuideVisible} 
+                                        onOk={handleContributionGuideOk} 
+                                        onCancel={handleContributionGuideCancel}
+                                        footer={[
+                                            <Button key="submit" type="primary" onClick={handleContributionGuideOk}>
+                                            Ok
+                                            </Button>,
+                                        ]}
+                                    >
+                                        {parse(contributionGuide.description)}                                
+                                    </Modal>
+                                </>
+                                )}
 
                             </div>
                         </>

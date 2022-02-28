@@ -409,6 +409,10 @@ export const GET_TASK_BY_ID = gql`
         id
         title
         description
+        category {
+          id
+          name
+        }
       } 
     }
     statusList

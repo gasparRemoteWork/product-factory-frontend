@@ -671,7 +671,7 @@ const AddTask: React.FunctionComponent<Props> = (
                         {allGuides &&
                         allGuides.map((option: { id: string, title: string, category: {id: string, name: string}|null }) => (
                             <Option key={`guide-${option.id}`} value={option.id}>
-                                {option.title} ({option.category ? option.category.name:""})
+                                {option.title}
                             </Option>
                         ))}
                     </Select>

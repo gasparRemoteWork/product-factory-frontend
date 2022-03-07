@@ -258,7 +258,17 @@ const AddTask: React.FunctionComponent<Props> = (
                 setAvailableExpertises(ae);
                 setExpertise([]);
             } 
+
+            if(!modalType && allGuides) {
+                setContributionGuide(null);
+                allGuides.map((guide) => {
+                    if(guide.category && guide.category.name == category)
+                        setContributionGuide(guide.id);
+                });
+            }
+
         }
+
     }, [category]);
 
     useEffect(() => {
@@ -316,15 +326,6 @@ const AddTask: React.FunctionComponent<Props> = (
     useEffect(() => {
         if (guidesData && guidesData.contributorGuides) {
             setAllGuides(guidesData.contributorGuides);
-
-            if(task) {
-                if(!task.contributionGuide) {
-                    guidesData.contributorGuides.map((guide) => {
-                        if(guide.category && guide.category.name == task.taskCategory)
-                            setContributionGuide(guide.id);
-                    });
-                }
-            }
         }
     }, [guidesData]);
 

@@ -258,7 +258,17 @@ const AddTask: React.FunctionComponent<Props> = (
                 setAvailableExpertises(ae);
                 setExpertise([]);
             } 
+
+            if(!modalType && allGuides) {
+                setContributionGuide(null);
+                allGuides.map((guide) => {
+                    if(guide.category && guide.category.name == category)
+                        setContributionGuide(guide.id);
+                });
+            }
+
         }
+
     }, [category]);
 
     useEffect(() => {
@@ -314,7 +324,9 @@ const AddTask: React.FunctionComponent<Props> = (
     }, [tagsData]);
 
     useEffect(() => {
-        if (guidesData && guidesData.contributorGuides) setAllGuides(guidesData.contributorGuides)
+        if (guidesData && guidesData.contributorGuides) {
+            setAllGuides(guidesData.contributorGuides);
+        }
     }, [guidesData]);
 
     useEffect(() => {
@@ -658,7 +670,7 @@ const AddTask: React.FunctionComponent<Props> = (
                         allowClear={true}
                     >
                         {allGuides &&
-                        allGuides.map((option: { id: string, title: string }) => (
+                        allGuides.map((option: { id: string, title: string, category: {id: string, name: string}|null }) => (
                             <Option key={`guide-${option.id}`} value={option.id}>
                                 {option.title}
                             </Option>

@@ -409,6 +409,10 @@ export const GET_TASK_BY_ID = gql`
         id
         title
         description
+        category {
+          id
+          name
+        }
       } 
     }
     statusList
@@ -951,6 +955,10 @@ export const GET_CONTRIBUTOR_GUIDES = gql`
       id
       title
       description
+      category {
+        id
+        name
+      }
     }
   }
 `;

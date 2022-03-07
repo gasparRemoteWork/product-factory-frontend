@@ -94,6 +94,19 @@ const Task: React.FunctionComponent<Params> = ({
     const [tasks, setTasks] = useState([]);
     const [license, setLicense] = useState("");
 
+    const [isContributionGuideVisible, setIsContributionGuideVisible] = useState(false);
+    const showCotributionGuide = () => {
+        setIsContributionGuideVisible(true);
+    };
+    
+    const handleContributionGuideOk = () => {
+        setIsContributionGuideVisible(false);
+      };
+    
+    const handleContributionGuideCancel = () => {
+        setIsContributionGuideVisible(false);
+    };
+
     const [getPersonData, {data: personData}] = useLazyQuery(GET_PERSON, {
         fetchPolicy: "no-cache",
         enabled: false,
@@ -449,6 +462,7 @@ const Task: React.FunctionComponent<Params> = ({
             const assignee = getProp(task, "assignedTo", null);
             const taskStatus = TASK_TYPES[getProp(task, "status")];
             const inReview = getProp(task, "inReview", false);
+            const contributionGuide = getProp(task, "contributionGuide", "");
 
             return (
                 <Row className="text-sm">
@@ -480,6 +494,27 @@ const Task: React.FunctionComponent<Params> = ({
                                 <Button type="primary" onClick={() => claimTaskEvent()}>
                                     Claim the task
                                 </Button>
+                                {contributionGuide && (
+                                <>
+                                    <a style={{textAlign: 'center', marginTop: '5px', fontSize: '13px'}} 
+                                    href='#' onClick={() => showCotributionGuide()}>Contribution guide</a>
+
+                                    <Modal 
+                                        title="Contribution Guide" 
+                                        visible={isContributionGuideVisible} 
+                                        onOk={handleContributionGuideOk} 
+                                        onCancel={handleContributionGuideCancel}
+                                        footer={[
+                                            <Button key="submit" type="primary" onClick={handleContributionGuideOk}>
+                                            Ok
+                                            </Button>,
+                                        ]}
+                                    >
+                                        {parse(contributionGuide.description)}                                
+                                    </Modal>
+                                </>
+                                )}
+
                             </div>
                         </>
                     )}

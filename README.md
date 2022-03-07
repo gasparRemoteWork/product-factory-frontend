@@ -25,7 +25,7 @@ APPLICATION_MODE=development
 TEST_USER=UUID_OF_USER_FROM_DUMMY_DATA
 ```
 
-The `TEST_USER` should contain the UUID of the user that will be logged in when you click on the sign in button. After importing the dummy data, please get he generated UUID of a user from the `id` column of the `talent_person` table and use that.
+The `TEST_USER` should contain the UUID of the user that will be logged in when you click on the sign in button. After importing the dummy data, please get the generated UUID of a user from the `id` column of the `talent_person` table and use that.
 
 Then start the dev server using command:
 ```

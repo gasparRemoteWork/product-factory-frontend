@@ -101,14 +101,13 @@ const SettingsContributing: React.FunctionComponent = () => {
       </Space>
 
       {showModal &&
-      <ContributionGuideModal modal={showModal}
-                              item={currentItem}
-                              productSlug={productSlug}
-                              closeModal={closeModal}/>}
+        <ContributionGuideModal 
+          modal={showModal} item={currentItem} 
+          productSlug={productSlug.toString()} closeModal={closeModal}/>
+      }
 
       <DeleteModal
         modal={deleteModal}
-        productSlug={productSlug}
         closeModal={() => setDeleteModal(false)}
         submit={deleteGuide}
         description="Are you sure you want to delete contributor guide?"

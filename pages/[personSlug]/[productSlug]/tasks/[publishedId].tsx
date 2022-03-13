@@ -653,8 +653,26 @@ const Task: React.FunctionComponent<Params> = ({
                                             {parse(getProp(task, "description", ""))}
                                         </Col>
                                     </Row>
+
                                     <div className="mt-22">
+                                        {getProp(task, "taskCategory", null) && (
+                                            <Row style={{marginTop: 10}} className="text-sm mt-8">
+                                                <strong className="my-auto">Required skills:</strong>&nbsp;
+                                                <Col className="expertises expertises-task">
+                                                    {getProp(task, "taskCategory", null)}
+                                                    {getProp(task, "taskExpertise", null) && (
+                                                        getProp(task, "taskExpertise", null).map((exp, index) => 
+                                                            <>{index > 0?', ':' ('}{exp.name}</>
+                                                        )
+                                                    )}
+                                                    {getProp(task, "taskExpertise", null) && (<>)</>)}
+                                                </Col>
+                                                
+                                            </Row>
+                                        )}
+
                                         {showAssignedUser()}
+                                        
                                         <Row style={{marginTop: 10}} className="text-sm mt-8">
                                             <strong className="my-auto">Created By: </strong>
 
@@ -721,29 +739,6 @@ const Task: React.FunctionComponent<Params> = ({
                                                 </>
                                             )}
                                         </Row>
-                                        {getProp(task, "taskCategory", null) && (
-                                            <Row style={{marginTop: 10}} className="text-sm mt-8">
-                                                <strong className="my-auto">Category:&nbsp;</strong>
-                                                &nbsp;
-                                                <Typography className="text-grey-9">
-                                                    {getProp(task, "taskCategory", null)}
-                                                </Typography>
-                                            </Row>
-                                        )}
-                                        {getProp(task, "taskExpertise", null) && (
-                                            <Row style={{marginTop: 10}} className="text-sm mt-8">
-                                                <strong className="my-auto">Expertise:&nbsp;</strong>
-                                                &nbsp;
-                                                <Typography className="text-grey-9">
-                                                    {
-                                                        getProp(task, "taskExpertise", null).map((exp, index) =>
-                                                            <span>{index > 0?',':''} {exp.name}</span>
-                                                        ) 
-
-                                                    }
-                                                </Typography>
-                                            </Row>
-                                        )}
                                         {getProp(task, "priority", null) && (
                                             <Row style={{marginTop: 10}} className="text-sm mt-8">
                                                 <strong className="my-auto">Priority:&nbsp;</strong>

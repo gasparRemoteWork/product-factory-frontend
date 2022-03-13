@@ -86,6 +86,8 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
               const owner = getProp(taskListing, "product.owner", "");
               const canEdit = hasManagerRoots(getUserRole(roles, productSlug));
               const reviewer = getProp(taskListing, "reviewer", null);
+              const category = getProp(taskListing, "category", null);
+              const expertise = getProp(taskListing, "expertise", null);
 
               return (
                 <Col key={index} md={gridSizeMd} lg={gridSizeLg} sm={gridSizeSm} className="task-box">
@@ -179,6 +181,21 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
                       {/*  10 Points*/}
                       {/*</b>*/}
                     </p>
+
+                    {category && (
+                      <p>
+                          <div className="mb-5"><b className="mr-15">Required skills</b></div>
+                          <span className="expertises expertises-task-tile">
+                            {category}
+                            {expertise && (
+                                expertise.map((exp, index) => 
+                                    <>{index > 0?', ':' ('}{exp.name}</>
+                                )
+                            )}
+                            {expertise && (<>)</>)}
+                          </span>
+                      </p>  
+                    )}
                   </div>
                 </Col>
               );

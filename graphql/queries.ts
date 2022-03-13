@@ -106,7 +106,10 @@ export const GET_TASKS = gql`
       inReview
       tags
       category
-      expertise
+      expertise {
+        id
+        name
+      }
       blocked
       hasActiveDepends
       videoUrl
@@ -455,6 +458,11 @@ export const GET_TASKS_BY_PRODUCT = gql`
       reviewer {
         firstName
         username
+      }
+      category
+      expertise {
+        id
+        name
       }
     }
   }

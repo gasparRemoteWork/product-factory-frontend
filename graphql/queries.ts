@@ -294,7 +294,10 @@ query GetInitiative($id: Int!, $input: TaskListInput!) {
       }
       tags
       category
-      expertise
+      expertise {
+        id
+        name
+      }
       blocked
       hasActiveDepends
       assignedToPerson {

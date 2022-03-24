@@ -392,7 +392,7 @@ const AddTask: React.FunctionComponent<Props> = (
             shortDescription: shortDescription,
             status: status,
             productSlug,
-            initiative: initiative === 0 ? null : parseInt(initiative),
+            initiative: Boolean(initiative) ? parseInt(initiative) : null,
             capability: capability === 0 ? null : parseInt(capability),
             tags,
             dependOn,
@@ -559,6 +559,7 @@ const AddTask: React.FunctionComponent<Props> = (
                                 filterOption={filterOption}
                                 showSearch
                                 value={initiative ? initiative : null}
+                                allowClear
                             >
                                 {initiatives.map((option: any, idx: number) => (
                                     <Option key={`init${idx}`} value={option.id}>

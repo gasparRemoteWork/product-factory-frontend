@@ -10,8 +10,9 @@ import {getProp} from "../../../utilities/filters";
 type Props = {
     modal: boolean,
     closeModal: Function,
-    submit: Function,
     reject: Function,
+    requestRevision: Function,
+    submit: Function,
     taskId: number
 };
 
@@ -41,8 +42,9 @@ type Attachment = {
 const DeliveryMessageModal: React.SFC<Props> = ({
                                                     modal,
                                                     closeModal,
-                                                    submit,
                                                     reject,
+                                                    requestRevision,
+                                                    submit,
                                                     taskId
                                                 }) => {
     const [attempt, setAttempt] = useState<TaskDeliveryAttempt>({
@@ -73,13 +75,19 @@ const DeliveryMessageModal: React.SFC<Props> = ({
         closeModal(!modal);
     };
 
+    const handleReject = () => {
+        reject();
+    }
+
+    const handleRequestRevision = () => {
+        requestRevision();
+    }
+
     const handleOk = () => {
         submit();
     }
 
-    const handleReject = () => {
-        reject();
-    }
+
 
     console.log(attempt)
 
@@ -91,8 +99,12 @@ const DeliveryMessageModal: React.SFC<Props> = ({
                 onCancel={handleCancel}
                 footer={[
                     <Button style={{borderRadius: 4, borderWidth: 0, marginRight: 8}} key="back"
-                            onClick={handleReject} type="primary">
-                        Reject the work
+                            onClick={handleReject}>
+                        Unassign
+                    </Button>,
+                    <Button style={{borderRadius: 4, borderWidth: 0, marginRight: 8}} key="back"
+                            onClick={handleRequestRevision}>
+                        Ask for revision
                     </Button>,
                     <Button style={{borderRadius: 4}} key="submit" type="primary"
                             onClick={handleOk}>

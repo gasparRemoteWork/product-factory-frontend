@@ -32,6 +32,7 @@ import {
     IN_REVIEW_TASK,
     LEAVE_TASK,
     REJECT_TASK,
+    REQUEST_REVISION_TASK,
     APPROVE_TASK,
 } from "../../../../graphql/mutations";
 import {getProp} from "../../../../utilities/filters";
@@ -228,6 +229,29 @@ const Task: React.FunctionComponent<Params> = ({
             },
             onError() {
                 message.error("Failed to reject a work!").then();
+            },
+        }
+    );
+
+    const [requestRevisionTask, {loading: requestRevisionTaskLoading}] = useMutation(
+        REQUEST_REVISION_TASK,
+        {
+            variables: {taskId},
+            onCompleted(data) {
+                const {requestRevisionTask} = data;
+                const responseMessage = requestRevisionTask.message;
+                if (requestRevisionTask.success) {
+                    message.success(responseMessage).then();
+                    fetchData().then();
+                    showRejectTaskModal(false);
+                    setDeliveryModal(false);
+                    getPersonData();
+                } else {
+                    message.error(responseMessage).then();
+                }
+            },
+            onError() {
+                message.error("Failed to request revision for a work!").then();
             },
         }
     );
@@ -917,10 +941,12 @@ const Task: React.FunctionComponent<Params> = ({
                                 <CustomModal
                                     modal={rejectTaskModal}
                                     closeModal={() => showRejectTaskModal(false)}
-                                    submit={rejectTask}
+                                    submit={requestRevisionTask}
                                     title="Reject the work"
-                                    message="Do you really want to reject the work?"
-                                    submitText="Yes, reject"
+                                    message="Please choose one of the options below to reject the contribution."
+                                    submitText="Ask for revision"
+                                    secondarySubmits={[{text:"Unassign", action: rejectTask}]}
+                                    displayCancelButton={false}
                                 />
                             )}
                             {approveTaskModal && (
@@ -937,8 +963,9 @@ const Task: React.FunctionComponent<Params> = ({
                                 <DeliveryMessageModal
                                     modal={deliveryModal}
                                     closeModal={() => setDeliveryModal(false)}
-                                    submit={approveTask}
                                     reject={rejectTask}
+                                    requestRevision={requestRevisionTask}
+                                    submit={approveTask}
                                     taskId={taskId}/>
                             )}
                         </>

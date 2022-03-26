@@ -301,6 +301,15 @@ export const REJECT_TASK = gql`
   }
 `;
 
+export const REQUEST_REVISION_TASK = gql`
+  mutation requestRevisionTask($taskId: Int!) {
+    requestRevisionTask(taskId: $taskId) {
+      success
+      message
+    }
+  }
+`;
+
 export const APPROVE_TASK = gql`
   mutation approveTask($taskId: Int!) {
     approveTask(taskId: $taskId) {

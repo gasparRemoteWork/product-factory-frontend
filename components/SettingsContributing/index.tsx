@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {connect} from 'react-redux';
 import {Button, Table, Space, Typography, Tag, message} from "antd";
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import {useRouter} from "next/router";
@@ -8,9 +9,14 @@ import ContributionGuideModal from "../ContributionGuideModal";
 import parse from "html-react-parser";
 import DeleteModal from "../Products/DeleteModal";
 import {DELETE_CONTRIBUTION_GUIDE} from "../../graphql/mutations";
+import showUnAuthModal from "../UnAuthModal";
 
+type Params = {
+  loginUrl: string;
+  registerUrl: string;
+}
 
-const SettingsContributing: React.FunctionComponent = () => {
+const SettingsContributing: React.FunctionComponent<Params> = ({loginUrl, registerUrl}) => {
   const router = useRouter();
   const {productSlug} = router.query;
   const [showModal, setShowModal] = useState(false);
@@ -34,8 +40,13 @@ const SettingsContributing: React.FunctionComponent = () => {
         message.error("Contributor guide was not found").then();
       }
     },
-    onError({ message: sysMessage}) {
-      message.error(sysMessage || "Can't delete the guide").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        setDeleteModal(false);
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(e.message || "Can't delete the guide").then();
+      }
     }
   })
 
@@ -117,4 +128,12 @@ const SettingsContributing: React.FunctionComponent = () => {
   )
 }
 
-export default SettingsContributing;
+const mapStateToProps = (state: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(SettingsContributing);

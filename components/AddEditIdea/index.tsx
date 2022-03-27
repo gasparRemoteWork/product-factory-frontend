@@ -10,6 +10,7 @@ import {RICH_TEXT_EDITOR_WIDTH} from '../../utilities/constants';
 import {getProp} from "../../utilities/filters";
 import RichTextEditor from "../RichTextEditor";
 // import {IDEA_TYPES} from "../../graphql/types";
+import showUnAuthModal from "../UnAuthModal";
 
 const {Option} = Select;
 
@@ -32,6 +33,9 @@ type Props = {
     } | null,
     ideaType: string,
   },
+  editMode?: boolean;
+  loginUrl: string;
+  registerUrl: string;
 };
 
 const AddEditIdea: React.FunctionComponent<Props> = (
@@ -42,6 +46,8 @@ const AddEditIdea: React.FunctionComponent<Props> = (
     editMode = false,
     idea,
     submit,
+    loginUrl,
+    registerUrl
   }
 ) => {
   const [headline, setHeadline] = useState(editMode ? idea.headline : '');
@@ -222,7 +228,13 @@ const AddEditIdea: React.FunctionComponent<Props> = (
 
       closeModal(!modal);
     } catch (e) {
-      message.error(e.message);
+      if(e.message === "The person is undefined, please login to perform this action") {
+        closeModal(!modal);
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.error(e.message);
+      }
+
     }
   }
 
@@ -302,6 +314,8 @@ const AddEditIdea: React.FunctionComponent<Props> = (
 const mapStateToProps = (state: any) => ({
   user: state.user,
   currentProduct: state.work.currentProduct,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 export default connect(

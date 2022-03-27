@@ -16,6 +16,7 @@ import {PlusOutlined, MinusOutlined} from "@ant-design/icons";
 import {RICH_TEXT_EDITOR_WIDTH} from "../../../utilities/constants";
 import {getProp} from "../../../utilities/filters";
 import RichTextEditor from "../../RichTextEditor";
+import showUnAuthModal from "../../UnAuthModal";
 
 
 const {Option} = Select;
@@ -40,7 +41,8 @@ type Props = {
     user: any;
     initiativeID: number;
     capabilityID: number;
-
+    loginUrl: string;
+    registerUrl: string;
 };
 
 interface Category {
@@ -69,6 +71,8 @@ const AddTask: React.FunctionComponent<Props> = (
         user,
         initiativeID,
         capabilityID,
+        loginUrl,
+        registerUrl
     }
 ) => {
     const [title, setTitle] = useState(modalType ? task.title : "");
@@ -426,7 +430,12 @@ const AddTask: React.FunctionComponent<Props> = (
 
             closeModal(!modal);
         } catch (e) {
-            message.error(e.message);
+            if(e.message === "The person is undefined, please login to perform this action") {
+                closeModal(!modal);
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {
+                message.error(e.message);
+            }
         }
     }
 
@@ -705,6 +714,8 @@ const mapStateToProps = (state: any) => ({
     currentProduct: state.work.currentProduct,
     userRole: state.work.userRole,
     allTags: state.work.allTags,
+    loginUrl: state.work.loginUrl,
+    registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = () => ({});

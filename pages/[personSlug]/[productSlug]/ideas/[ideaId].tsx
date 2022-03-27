@@ -19,6 +19,7 @@ import CustomAvatar2 from "../../../../components/CustomAvatar2";
 import AddEditIdea from "../../../../components/AddEditIdea";
 import Comments from "../../../../components/Comments";
 import Head from "next/head";
+import showUnAuthModal from "../../../../components/UnAuthModal";
 
 const getIdeaType = (ideaType: number) => {
   let searchedType = IDEA_TYPES.filter((t) => t.id === ideaType)
@@ -28,9 +29,11 @@ const getIdeaType = (ideaType: number) => {
 type Params = {
   user?: any;
   currentProduct: any;
+  loginUrl: string;
+  registerUrl: string;
 };
 
-const Idea: React.FunctionComponent<Params> = ({user}) => {
+const Idea: React.FunctionComponent<Params> = ({user, loginUrl, registerUrl}) => {
   const router = useRouter();
   const {ideaId, personSlug, productSlug} = router.query;
 
@@ -55,8 +58,12 @@ const Idea: React.FunctionComponent<Params> = ({user}) => {
       message.success("Item is successfully deleted!").then();
       router.push(getBasePath() === "" ? "/" : `${getBasePath()}/ideas-and-bugs`).then();
     },
-    onError() {
-      message.error("Failed to delete item!").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error("Failed to delete item!").then();
+      }
     }
   });
 
@@ -72,7 +79,13 @@ const Idea: React.FunctionComponent<Params> = ({user}) => {
       message[success ? "success" : "error"](voteMessage).then();
       if (success) refetch();
     },
-    onError: (msg) => message.error(msg.voteIdea.message).then(),
+    onError: (e) => {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(e.message).then();
+      }
+    }
   });
 
   useEffect(() => {
@@ -226,7 +239,9 @@ const Idea: React.FunctionComponent<Params> = ({user}) => {
 
 const mapStateToProps = (state: any) => ({
   user: state.user,
-  currentProduct: state.work.currentProduct || {}
+  currentProduct: state.work.currentProduct || {},
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 export default connect(

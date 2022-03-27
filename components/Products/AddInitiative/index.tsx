@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {connect} from 'react-redux';
 import {Modal, Row, Input, message, Button, Select, Col} from "antd";
 import {useMutation} from "@apollo/react-hooks";
 import {CREATE_INITIATIVE, UPDATE_INITIATIVE} from "../../../graphql/mutations";
@@ -6,7 +7,7 @@ import {INITIATIVE_TYPES} from "../../../graphql/types";
 import {getProp} from "../../../utilities/filters";
 import {RICH_TEXT_EDITOR_WIDTH} from "../../../utilities/constants";
 import RichTextEditor from "../../RichTextEditor";
-
+import showUnAuthModal from "../../UnAuthModal";
 
 const {Option} = Select;
 
@@ -19,6 +20,8 @@ type Props = {
   handleDelete?: Function;
   submit: Function;
   initiative?: any;
+  loginUrl: string;
+  registerUrl: string;
 };
 
 const AddInitiative: React.FunctionComponent<Props> = (
@@ -29,7 +32,9 @@ const AddInitiative: React.FunctionComponent<Props> = (
     modalType,
     initiative,
     handleDelete,
-    submit
+    submit,
+    loginUrl,
+    registerUrl
   }
 ) => {
   const [name, setName] = useState(
@@ -76,7 +81,11 @@ const AddInitiative: React.FunctionComponent<Props> = (
         submit();
       }
     } catch (e) {
-      message.success("Initiative modification is failed!");
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.success("Initiative modification is failed!");
+      }
     }
   }
 
@@ -99,7 +108,11 @@ const AddInitiative: React.FunctionComponent<Props> = (
         submit();
       }
     } catch (e) {
-      message.success("Initiative creation is failed!");
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.success("Initiative creation is failed!");
+      }
     }
   }
 
@@ -221,4 +234,12 @@ const AddInitiative: React.FunctionComponent<Props> = (
   );
 }
 
-export default AddInitiative;
+const mapStateToProps = (state: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(AddInitiative);

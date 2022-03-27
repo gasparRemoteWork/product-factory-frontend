@@ -9,6 +9,7 @@ import {CREATE_BUG, UPDATE_BUG} from '../../graphql/mutations';
 import {RICH_TEXT_EDITOR_WIDTH} from '../../utilities/constants';
 import {getProp} from "../../utilities/filters";
 import RichTextEditor from "../RichTextEditor";
+import showUnAuthModal from "../UnAuthModal";
 
 const {Option} = Select;
 
@@ -31,6 +32,9 @@ type Props = {
     } | null,
     bugType: boolean,
   },
+  editMode?: boolean,
+  loginUrl: string;
+  registerUrl: string;
 };
 
 const AddEditBug: React.FunctionComponent<Props> = (
@@ -41,6 +45,8 @@ const AddEditBug: React.FunctionComponent<Props> = (
     editMode = false,
     bug,
     submit,
+    loginUrl,
+    registerUrl
   }
 ) => {
   const [headline, setHeadline] = useState(editMode ? bug.headline : '');
@@ -216,7 +222,15 @@ const AddEditBug: React.FunctionComponent<Props> = (
 
       closeModal(!modal);
     } catch (e) {
-      message.error(e.message);
+      if(e.message === "The person is undefined, please login to perform this action") {
+        // seems like there is no valid session of the user
+        // ask user to sign in again
+        closeModal(!modal);
+
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.error(e.message);
+      }
     }
   }
 
@@ -285,6 +299,8 @@ const AddEditBug: React.FunctionComponent<Props> = (
 const mapStateToProps = (state: any) => ({
   user: state.user,
   currentProduct: state.work.currentProduct,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl
 });
 
 export default connect(

@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import {connect} from 'react-redux';
 import {EditProfileProps, ProfileType, Website} from "../interfaces";
 import {Category, Skill, SkillExpertise} from "../../SkillsComponents/interfaces";
 import {Avatar, Button, Col, Input, message, Row, Select, Typography, Upload, Checkbox} from "antd";
@@ -16,10 +17,11 @@ import {findCategory} from "../helpers";
 import SkillsSelect from "../../CreatePersonModal/Skills/SkillsSelect"
 import ExpertiseTable from "../../CreatePersonModal/Skills/ExpertiseTable"
 import AvatarUploadModal from '../../CreatePersonModal/AvatarUploadModal'
+import showUnAuthModal from "../../UnAuthModal";
 
 const {Option} = Select;
 
-const EditProfile = ({profile, setProfile}: EditProfileProps) => {
+const EditProfile = ({profile, setProfile, loginUrl, registerUrl}: EditProfileProps) => {
     const [firstName, setFirstName] = useState<string>(profile.firstName.split(' ')[0]);
     const [lastName, setLastName] = useState<string>(profile.firstName.split(' ')[1]);
     const [bio, setBio] = useState<string>(profile.bio);
@@ -54,8 +56,12 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
                 message.error(messageText).then();
             }
         },
-        onError() {
-            message.error('Error with person profile updating').then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error('Error with person profile updating').then();
+            }
         }
     });
 
@@ -127,8 +133,12 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
                 message.error(messageText).then();
             }
         },
-        onError() {
-            message.error('Error with person profile updating').then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error('Error with person profile updating').then();
+            }
         }
     });
 
@@ -145,8 +155,12 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
                 message.error(messageText).then();
             }
         },
-        onError() {
-            message.error('Upload file failed').then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error('Upload file failed').then();
+            }
         }
     });
 
@@ -368,4 +382,12 @@ const EditProfile = ({profile, setProfile}: EditProfileProps) => {
     )
 }
 
-export default EditProfile;
+const mapStateToProps = (state: any) => ({
+    loginUrl: state.work.loginUrl,
+    registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+    mapStateToProps,
+    null
+)(EditProfile);

@@ -1,4 +1,5 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
+import {connect} from 'react-redux';
 import {Row, message, Input, Button, Col, Switch} from 'antd';
 import {useMutation} from '@apollo/react-hooks';
 import {useRouter} from 'next/router';
@@ -10,6 +11,7 @@ import {Upload} from 'antd';
 import ImgCrop from 'antd-img-crop';
 import 'antd/es/modal/style';
 import 'antd/es/slider/style';
+import showUnAuthModal from "../UnAuthModal";
 
 
 const {TextArea} = Input;
@@ -23,6 +25,8 @@ interface IAddOrEditProductProps {
   toDelete?: number,
   closeModal?: Function,
   loading?: boolean,
+  loginUrl: string;
+  registerUrl: string;
 }
 
 const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
@@ -33,6 +37,8 @@ const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
     toUpdate = 0,
     toDelete = 0,
     loading = false,
+    loginUrl,
+    registerUrl
   }
   ) => {
     const router = useRouter();
@@ -97,9 +103,14 @@ const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
           setIsShowLoading(false);
         }
       },
-      onError() {
-        message.error('Error with product creation').then();
+      onError(e) {
         setIsShowLoading(false);
+
+        if(e.message === "The person is undefined, please login to perform this action") {
+          showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+        } else {
+          message.error('Error with product creation').then();
+        }
       }
     });
 
@@ -121,9 +132,14 @@ const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
           setIsShowLoading(false);
         }
       },
-      onError() {
-        message.error('Error with product updating').then();
+      onError(e) {
         setIsShowLoading(false);
+
+        if(e.message === "The person is undefined, please login to perform this action") {
+          showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+        } else {
+          message.error('Error with product updating').then();
+        }
       }
     });
 
@@ -144,9 +160,14 @@ const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
           setIsShowLoading(false);
         }
       },
-      onError() {
-        message.error('Error with product deletion').then();
+      onError(e) {
         setIsShowLoading(false);
+
+        if(e.message === "The person is undefined, please login to perform this action") {
+          showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+        } else {
+          message.error('Error with product deletion').then();
+        }
       }
     });
 
@@ -323,4 +344,12 @@ const AddOrEditProduct: React.FunctionComponent<IAddOrEditProductProps> = (
   }
 ;
 
-export default AddOrEditProduct;
+const mapStateToProps = (state: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(AddOrEditProduct);

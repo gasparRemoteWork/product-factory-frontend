@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import {connect} from 'react-redux';
 import { Modal, Row, Input, message, Button, Upload } from 'antd';
 import { useMutation } from '@apollo/react-hooks';
 import { CREATE_ATTACHMENT } from '../../graphql/mutations';
 import { validURL, formatBytes } from '../../utilities/utils';
+import showUnAuthModal from "../UnAuthModal";
 
 const { Dragger } = Upload;
 
@@ -27,13 +29,17 @@ type Props = {
     closeModal: any;
     submit: Function;
     capabilityId?: number;
+    loginUrl: string;
+    registerUrl: string;
 };
 
 const Add: React.FunctionComponent<Props> = ({
   modal,
   closeModal,
   submit,
-  capabilityId
+  capabilityId,
+  loginUrl,
+  registerUrl
 }) => {
   const [path, setPath] = useState('');
   const [createAttachment] = useMutation(CREATE_ATTACHMENT);
@@ -72,7 +78,11 @@ const Add: React.FunctionComponent<Props> = ({
         submit(res.data.createAttachment.attachment);
       }
     } catch (e) {
-      message.success('Initiative creation is failed!');
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.success('Initiative creation is failed!');
+      }
     }
   }
 
@@ -118,4 +128,12 @@ const Add: React.FunctionComponent<Props> = ({
   );
 }
 
-export default Add;
+const mapStateToProps = (state: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(Add);

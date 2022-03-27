@@ -8,6 +8,7 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import "./style.less";
 import {UPDATE_CONTRIBUTION_GUIDE, CREATE_CONTRIBUTION_GUIDE} from "../../graphql/mutations";
 import { GET_CATEGORIES_LIST } from "../../graphql/queries";
+import showUnAuthModal from "../UnAuthModal";
 
 const { Option } = Select;
 const {TreeNode} = TreeSelect;
@@ -28,7 +29,9 @@ type Props = {
     title: string,
     description: string,
     category: Category
-  }
+  },
+  loginUrl: string;
+  registerUrl: string;
 };
 
 const ContributionGuideModal: React.FunctionComponent<Props> = ({
@@ -36,6 +39,8 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
   closeModal,
   item,
   productSlug,
+  loginUrl,
+  registerUrl,
 }) => {
   const [allCategories, setAllCategories] = React.useState([]);
   const [category, setCategory] = useState("");
@@ -91,8 +96,13 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
         message.error(res.createContributionGuide.message).then();
       }
     },
-    onError({ message: sysMessage}) {
-      message.error(sysMessage || "Can't save the guide").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        closeModal(true);
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(e.message || "Can't save the guide").then();
+      }
     }
   })
 
@@ -105,8 +115,13 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
         message.error(res.updateContributionGuide.message).then();
       }
     },
-    onError({ message: sysMessage}) {
-      message.error(sysMessage || "Can't save the guide").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        closeModal(true);
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(e.message || "Can't save the guide").then();
+      }
     }
   })
 
@@ -206,12 +221,11 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
 }
 
 const mapStateToProps = (state: any) => ({
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  null
 )(ContributionGuideModal);

@@ -57,6 +57,8 @@ export interface Paginator {
 export interface EditProfileProps {
     profile: ProfileType
     setProfile: Function
+    loginUrl: string
+    registerUrl: string
 }
 
 export interface TaskDetailProps {

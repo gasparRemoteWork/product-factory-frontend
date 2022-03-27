@@ -24,12 +24,16 @@ import FilledCircle from "../../../../public/assets/icons/filled-circle.svg";
 import VideoPlayer from "../../../../components/VideoPlayer";
 import AddTask from "../../../../components/Products/AddTask";
 import Head from "next/head";
+import showUnAuthModal from "../../../../components/UnAuthModal";
+
 
 type Params = {
   user: any;
+  loginUrl: string;
+  registerUrl: string;
 };
 
-const InitiativeDetail: React.FunctionComponent<Params> = ({user}) => {
+const InitiativeDetail: React.FunctionComponent<Params> = ({user, loginUrl, registerUrl}) => {
   const router = useRouter();
   let {initiativeId, productSlug} = router.query;
   productSlug = String(productSlug);
@@ -60,8 +64,12 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user}) => {
       message.success("Item is successfully deleted!").then();
       router.push(`/${getProp(initiative, 'product.owner')}/${productSlug}/initiatives`).then();
     },
-    onError() {
-      message.error("Failed to delete item").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error("Failed to delete item").then();
+      }
     }
   });
 
@@ -237,6 +245,8 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user}) => {
 const mapStateToProps = (state: any) => ({
   user: state.user,
   userRole: state.work.userRole,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = () => ({});

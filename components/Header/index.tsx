@@ -47,7 +47,8 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
         avatar: '',
         skills: [],
         websites: [],
-        websiteTypes: []
+        websiteTypes: [],
+        preferences: {sendMeChallenges: false},
     });
 
     useEffect(() => {

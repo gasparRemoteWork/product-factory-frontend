@@ -158,8 +158,12 @@ const Task: React.FunctionComponent<Params> = ({
             message.success("Item is successfully deleted!").then();
             router.push(getBasePath() === "" ? "/" : `${getBasePath()}/tasks`).then();
         },
-        onError() {
-            message.error("Failed to delete item!").then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error("Failed to delete item!").then();
+            }
         },
     });
 
@@ -182,8 +186,12 @@ const Task: React.FunctionComponent<Params> = ({
                 message.error(responseMessage).then();
             }
         },
-        onError() {
-            message.error("Failed to leave a task!").then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error("Failed to leave a task!").then();
+            }
         },
     });
 
@@ -203,8 +211,12 @@ const Task: React.FunctionComponent<Params> = ({
                     message.error(responseMessage).then();
                 }
             },
-            onError() {
-                message.error("Failed to submit the task in review!").then();
+            onError(e) {
+                if(e.message === "The person is undefined, please login to perform this action") {
+                    showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+                } else {                
+                    message.error("Failed to submit the task in review!").then();
+                }
             },
         }
     );
@@ -226,8 +238,12 @@ const Task: React.FunctionComponent<Params> = ({
                     message.error(responseMessage).then();
                 }
             },
-            onError() {
-                message.error("Failed to reject a work!").then();
+            onError(e) {
+                if(e.message === "The person is undefined, please login to perform this action") {
+                    showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+                } else {                
+                    message.error("Failed to reject a work!").then();
+                }
             },
         }
     );
@@ -249,8 +265,12 @@ const Task: React.FunctionComponent<Params> = ({
                     message.error(responseMessage).then();
                 }
             },
-            onError() {
-                message.error("Failed to approve a work!").then();
+            onError(e) {
+                if(e.message === "The person is undefined, please login to perform this action") {
+                    showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+                } else {                
+                    message.error("Failed to approve a work!").then();
+                }
             },
         }
     );
@@ -270,8 +290,12 @@ const Task: React.FunctionComponent<Params> = ({
                 }
             }
         },
-        onError() {
-            message.error("Failed to accept agreement").then();
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            } else {            
+                message.error("Failed to accept agreement").then();
+            }
         },
     });
 
@@ -329,10 +353,8 @@ const Task: React.FunctionComponent<Params> = ({
         onError({graphQLErrors, networkError}) {
             if (graphQLErrors && graphQLErrors.length > 0) {
                 let msg = graphQLErrors[0].message;
-                if (
-                    msg === "The person is undefined, please login to perform this action"
-                ) {
-                    showUnAuthModal(actionName, loginUrl, registerUrl);
+                if (msg === "The person is undefined, please login to perform this action") {
+                    showUnAuthModal(actionName, loginUrl, registerUrl, true);
                 } else {
                     message.error(msg).then();
                 }
@@ -348,7 +370,7 @@ const Task: React.FunctionComponent<Params> = ({
     const claimTaskEvent = () => {
         let userId = user.id;
         if (userId === undefined || userId === null) {
-            showUnAuthModal(actionName, loginUrl, registerUrl);
+            showUnAuthModal(actionName, loginUrl, registerUrl, true);
             return;
         }
 

@@ -7,13 +7,16 @@ import {getProp} from "../../utilities/filters";
 import {UPDATE_LICENSE} from "../../graphql/mutations";
 import {connect} from "react-redux";
 import RichTextEditor from "../RichTextEditor";
+import showUnAuthModal from "../UnAuthModal";
 
 
 interface ISettingsPoliciesProps {
-  user: any
+  user: any;
+  loginUrl: string;
+  registerUrl: string;
 }
 
-const SettingsPolicies: React.FunctionComponent<ISettingsPoliciesProps> = ({user}) => {
+const SettingsPolicies: React.FunctionComponent<ISettingsPoliciesProps> = ({user, loginUrl, registerUrl}) => {
   const router = useRouter();
   const {productSlug} = router.query;
 
@@ -30,8 +33,12 @@ const SettingsPolicies: React.FunctionComponent<ISettingsPoliciesProps> = ({user
         message.error(getProp(res, 'updateLicense.message', 'Error')).then();
       }
     },
-    onError() {
-      message.error('Error with license updating').then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error('Error with license updating').then();
+      }
     }
   })
 
@@ -72,14 +79,12 @@ const SettingsPolicies: React.FunctionComponent<ISettingsPoliciesProps> = ({user
 }
 
 const mapStateToProps = (state: any) => ({
-  user: state.user
+  user: state.user,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
-const mapDispatchToProps = () => ({});
-
-const SettingsPoliciesContainer = connect(
+export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  null
 )(SettingsPolicies);
-
-export default SettingsPoliciesContainer;

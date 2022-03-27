@@ -16,13 +16,16 @@ import CustomAvatar2 from "../../../../components/CustomAvatar2";
 import AddEditBug from "../../../../components/AddEditBug";
 import Comments from "../../../../components/Comments";
 import Head from "next/head";
+import showUnAuthModal from "../../../../components/UnAuthModal";
 
 
 type Params = {
   user?: any;
+  loginUrl: string;
+  registerUrl: string;
 };
 
-const Bug: React.FunctionComponent<Params> = ({user}) => {
+const Bug: React.FunctionComponent<Params> = ({user, loginUrl, registerUrl}) => {
   const router = useRouter();
   const {bugId, personSlug, productSlug} = router.query;
 
@@ -47,8 +50,12 @@ const Bug: React.FunctionComponent<Params> = ({user}) => {
       message.success("Item is successfully deleted!").then();
       router.push(getBasePath() === "" ? "/" : `${getBasePath()}/ideas-and-bugs`).then();
     },
-    onError() {
-      message.error("Failed to delete item!").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error("Failed to delete item!").then();
+      }
     }
   });
 
@@ -64,7 +71,13 @@ const Bug: React.FunctionComponent<Params> = ({user}) => {
       message[success ? "success" : "error"](voteMessage).then();
       if (success) refetch();
     },
-    onError: (msg) => message.error(msg.voteBug.message).then(),
+    onError: (e) => {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(e.message).then()
+      }
+    }
   });
 
   useEffect(() => {
@@ -220,7 +233,9 @@ const Bug: React.FunctionComponent<Params> = ({user}) => {
 };
 
 const mapStateToProps = (state: any) => ({
-  user: state.user
+  user: state.user,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 export default connect(

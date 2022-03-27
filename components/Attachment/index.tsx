@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {connect} from 'react-redux';
 import { Row, Col, Button, message } from 'antd';
 import { useMutation } from '@apollo/react-hooks';
 import { DELETE_ATTACHMENT } from '../../graphql/mutations';
@@ -12,6 +13,8 @@ import ImageIcon from '../../public/assets/icons/image.svg';
 import PDFIcon from '../../public/assets/icons/pdf.svg';
 import DocIcon from '../../public/assets/icons/doc.svg';
 import DownloadIcon from '../../public/assets/icons/download.svg';
+
+import showUnAuthModal from "../UnAuthModal";
 
 const Icon = (fileType: any) => {
   switch(fileType) {
@@ -29,13 +32,17 @@ type Props = {
   capabilityId?: number;
   editMode: boolean;
   setAttachments?: any;
+  loginUrl: string;
+  registerUrl: string;
 }
 
 const Attachment: React.FunctionComponent<Props> = ({
   attachments,
   capabilityId,
   editMode,
-  setAttachments
+  setAttachments,
+  loginUrl,
+  registerUrl
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteAttachment] = useMutation(DELETE_ATTACHMENT, {
@@ -52,8 +59,12 @@ const Attachment: React.FunctionComponent<Props> = ({
         }
       }
     },
-    onError(err) {
-      message.error("Failed to delete item!");
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.error("Failed to delete item!");
+      }
     }
   });
 
@@ -149,4 +160,12 @@ const Attachment: React.FunctionComponent<Props> = ({
   )
 }
 
-export default Attachment;
+const mapStateToProps = (state: any) => ({
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(Attachment);

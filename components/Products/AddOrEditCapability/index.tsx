@@ -9,7 +9,7 @@ import {useRouter} from "next/router";
 // import {GET_STACKS} from "../../../graphql/queries";
 import RichTextEditor from "../../RichTextEditor";
 import {RICH_TEXT_EDITOR_WIDTH} from "../../../utilities/constants";
-
+import showUnAuthModal from "../../UnAuthModal";
 
 const {Option} = Select;
 
@@ -23,6 +23,8 @@ type Props = {
   userRole: string;
   currentProduct?: any;
   hideParentOptions?: boolean;
+  loginUrl: string;
+  registerUrl: string;
 };
 
 const AddOrEditCapability: React.FunctionComponent<Props> = (
@@ -31,7 +33,9 @@ const AddOrEditCapability: React.FunctionComponent<Props> = (
     capability,
     closeModal,
     modalType,
-    submit
+    submit,
+    loginUrl,
+    registerUrl
   }
 ) => {
   const router = useRouter();
@@ -110,7 +114,11 @@ const AddOrEditCapability: React.FunctionComponent<Props> = (
         submit();
       }
     } catch (e) {
-      message.success(`Capability modification is failed!  Reason: ${e.message}`);
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.success(`Capability modification is failed!  Reason: ${e.message}`);
+      }
     }
   }
 
@@ -133,7 +141,11 @@ const AddOrEditCapability: React.FunctionComponent<Props> = (
         submit();
       }
     } catch (e) {
-      message.error(`Capability creation is failed!: Reason: ${e.message}`);
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error(`Capability creation is failed!: Reason: ${e.message}`);
+      }
     }
   }
 
@@ -217,14 +229,12 @@ const mapStateToProps = (state: any) => ({
   user: state.user,
   currentProduct: state.work.currentProduct,
   userRole: state.work.userRole,
-  allTags: state.work.allTags
+  allTags: state.work.allTags,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
-const mapDispatchToProps = () => ({});
-
-const AddCapabilityContainer = connect(
+export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  null
 )(AddOrEditCapability);
-
-export default AddCapabilityContainer;

@@ -13,15 +13,18 @@ import EditIcon from 'components/EditIcon';
 import {getProp} from 'utilities/filters';
 import {getUserRole, hasManagerRoots, randomKeys} from 'utilities/utils';
 import Loading from "../../Loading";
+import showUnAuthModal from "../../UnAuthModal";
 
 type Params = {
   productSlug?: any;
   initiativeId?: any;
   user: any;
   currentProduct: any;
+  loginUrl: string;
+  registerUrl: string;
 } & RouteComponentProps;
 
-const InitiativeDetail: React.FunctionComponent<Params> = ({user, currentProduct, params}) => {
+const InitiativeDetail: React.FunctionComponent<Params> = ({user, currentProduct, loginUrl, registerUrl, params}) => {
   const {data: original, error, loading, refetch} = useQuery(GET_INITIATIVE_BY_ID, {
     variables: {id: params.params.initiativeId}
   });
@@ -37,8 +40,12 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, currentProduct
       message.success("Item is successfully deleted!").then();
       history.push(`/${params.params.personSlug}/${params.params.productSlug}/initiatives`);
     },
-    onError(err) {
-      message.error("Failed to delete item!").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error("Failed to delete item!").then();
+      }
     }
   });
 
@@ -148,6 +155,8 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, currentProduct
 const mapStateToProps = (state: any) => ({
   user: state.user,
   currentProduct: state.work.currentProduct,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = () => ({});

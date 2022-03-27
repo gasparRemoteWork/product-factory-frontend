@@ -12,16 +12,22 @@ import Loading from "../Loading";
 import AddOrEditCapability from "../Products/AddOrEditCapability";
 import {getUserRole, hasManagerRoots} from "../../utilities/utils";
 import {connect} from "react-redux";
-
+import showUnAuthModal from "../UnAuthModal";
 
 const {Search} = Input;
 
 
 interface IProductMapTree {
-  user: any
+  user: any;
+  loginUrl: string;
+  registerUrl: string;
 }
 
-const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({user}) => {
+const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({
+  user,
+  loginUrl,
+  registerUrl
+}) => {
   const router = useRouter();
   const {personSlug, productSlug} = router.query;
 
@@ -118,8 +124,13 @@ const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({user}) => {
       message.success('Item is successfully deleted!').then();
       refetch().then();
     },
-    onError() {
-      message.error('Failed to delete item!').then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.error('Failed to delete item!').then();
+      }
+      
     }
   });
 
@@ -131,8 +142,12 @@ const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({user}) => {
         message.error('Failed to update product tree').then();
       }
     },
-    onError() {
-      message.error('Failed to update product tree').then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {
+        message.error('Failed to update product tree').then();
+      }
     }
   });
 
@@ -319,14 +334,12 @@ const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({user}) => {
 }
 
 const mapStateToProps = (state: any) => ({
-  user: state.user
+  user: state.user,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
-const mapDispatchToProps = () => ({});
-
-const ProductMapTreeContainer = connect(
+export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  null
 )(ProductMapTree);
-
-export default ProductMapTreeContainer;

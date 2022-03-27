@@ -42,6 +42,7 @@ import Comments from "../../../../components/Comments";
 import VideoPlayer from "../../../../components/VideoPlayer";
 import AddTask from "../../../../components/Products/AddTask";
 import Head from "next/head";
+import showUnAuthModal from "../../../../components/UnAuthModal";
 
 const { Content } = Layout;
 
@@ -65,6 +66,8 @@ interface IParentsCrumbsProps {
 
 interface ICapabilityDetailProps {
   user: any;
+  loginUrl: string;
+  registerUrl: string;
 }
 
 const ParentsCrumbs: React.FunctionComponent<IParentsCrumbsProps> = ({
@@ -120,7 +123,7 @@ const ParentsCrumbs: React.FunctionComponent<IParentsCrumbsProps> = ({
 };
 
 const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
-  user,
+  user, loginUrl, registerUrl
 }) => {
   const router = useRouter();
   let { capabilityId, personSlug, productSlug } = router.query;
@@ -189,8 +192,12 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
       refetch().then();
       router.push(`/${personSlug}/${productSlug}/capabilities`).then();
     },
-    onError() {
-      message.error("Failed to delete item!").then();
+    onError(e) {
+      if(e.message === "The person is undefined, please login to perform this action") {
+        showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+      } else {      
+        message.error("Failed to delete item!").then();
+      }
     },
   });
 
@@ -365,6 +372,8 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
 
 const mapStateToProps = (state: any) => ({
   user: state.user,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = () => ({});

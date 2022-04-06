@@ -900,7 +900,6 @@ export const GET_PRODUCT_IDEA_BY_ID = gql`
   }
 `;
 
-
 export const GET_PRODUCT_BUG_BY_ID = gql`
   query GetProductIdeaById($id: Int) {
     bug(id: $id) {
@@ -1121,6 +1120,16 @@ export const GET_PERSON_TASK_DELIVERY_MESSAGE = gql`
         path
         fileType
       }
+    }
+  }
+`;
+
+export const GET_LOGGED_IN_USER = gql`
+  query GetPerson {
+    loggedInUser {
+      id
+      slug
+      username
     }
   }
 `;

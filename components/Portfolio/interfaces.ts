@@ -74,6 +74,8 @@ export interface ProfileProps {
         id: string
     }
     refetchProfile: Function
+    loginUrl: string
+    registerUrl: string
 }
 
 export interface PagesBarProps {

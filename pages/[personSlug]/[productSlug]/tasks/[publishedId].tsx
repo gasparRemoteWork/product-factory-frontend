@@ -23,6 +23,7 @@ import {
     GET_PRODUCT_INFO_BY_ID,
     GET_TASK_BY_ID,
     GET_TASKS_BY_PRODUCT_SHORT,
+    GET_LOGGED_IN_USER,
 } from "../../../../graphql/queries";
 import {TASK_TYPES, USER_ROLES} from "../../../../graphql/types";
 import {
@@ -69,9 +70,9 @@ type Params = {
 };
 
 const Task: React.FunctionComponent<Params> = ({
-                                                   user,
-                                                   userLogInAction,
-                                                   loginUrl,
+                                                    user,
+                                                    userLogInAction,
+                                                    loginUrl,
                                                     registerUrl
                                                }) => {
     const router = useRouter();
@@ -93,6 +94,7 @@ const Task: React.FunctionComponent<Params> = ({
     const [showEditModal, setShowEditModal] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [license, setLicense] = useState("");
+    const [actionName, setActionName] = useState("");
 
     const [isContributionGuideVisible, setIsContributionGuideVisible] = useState(false);
     const showCotributionGuide = () => {
@@ -107,11 +109,7 @@ const Task: React.FunctionComponent<Params> = ({
         setIsContributionGuideVisible(false);
     };
 
-    const [getPersonData, {data: personData}] = useLazyQuery(GET_PERSON, {
-        fetchPolicy: "no-cache",
-        enabled: false,
-        manual: true,
-    });
+    const [getPersonData, {data: personData}] = useLazyQuery(GET_PERSON, {fetchPolicy: "no-cache"});
 
     const {data: original, error, loading, refetch} = useQuery(GET_TASK_BY_ID, {
         fetchPolicy: "no-cache",
@@ -441,6 +439,33 @@ const Task: React.FunctionComponent<Params> = ({
         }
     }, [original]);
 
+    const  [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
+        fetchPolicy: "network-only",
+        notifyOnNetworkStatusChange: true,
+        onCompleted() {
+            if(actionName === "edit_task")
+                setShowEditModal(true);
+            else if (actionName === "delete_task")
+                showDeleteModal(true);
+        },
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            }
+        },
+
+    });
+
+    const showEditTask = () => {
+        setActionName("edit_task");
+        checkLoggedInUser();     
+    }
+
+    const showDeleteTask = () => {
+        setActionName("delete_task");
+        checkLoggedInUser();     
+    }
+
     if (loading) return <Loading/>;
 
     const showAssignedUser = () => {
@@ -598,7 +623,7 @@ const Task: React.FunctionComponent<Params> = ({
                 <Spin
                     tip="Loading..."
                     spinning={
-                        loading || leaveTaskLoading || claimTaskLoading || submitTaskLoading
+                        loading || leaveTaskLoading || claimTaskLoading || submitTaskLoading || checkLoggedInUserLoading
                     }
                     delay={200}
                 >
@@ -643,12 +668,12 @@ const Task: React.FunctionComponent<Params> = ({
                                     {userHasManagerRoots && (
                                         <>
                                             <Col>
-                                                <Button onClick={() => showDeleteModal(true)}>
+                                                <Button onClick={() => showDeleteTask()}>
                                                     Delete
                                                 </Button>
                                                 <EditIcon
                                                     className="ml-15"
-                                                    onClick={() => setShowEditModal(true)}
+                                                    onClick={() => showEditTask()}
                                                 />
                                                 {status === "In Review" && showInReviewEvents()}
                                             </Col>
@@ -986,7 +1011,7 @@ const mapStateToProps = (state: any) => ({
     user: state.user,
     currentProduct: state.work.currentProduct || {},
     loginUrl: state.work.loginUrl,
-    registerUrl: state.work.registerUrl
+    registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

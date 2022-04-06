@@ -42,8 +42,7 @@ const showUnAuthModal = (actionName: string, loginUrl="/", registerUrl="/", relo
       </div>
     ),
     okButtonProps: { disabled: true, style: {display: "none"} },
-    afterClose: checkPageReload,
-
+    onCancel: checkPageReload,
   })
 };
 

@@ -1,10 +1,13 @@
 import React, {useEffect} from "react";
 import {EditOutlined, UserOutlined} from "@ant-design/icons";
-import {Avatar, Button, Col, Divider, Row, Typography} from "antd";
+import {Avatar, Button, Col, Divider, Row, Typography, Spin} from "antd";
 import {ProfileProps} from "../interfaces";
 import {useRouter} from "next/router";
 import {connect} from "react-redux";
 import {apiDomain} from "../../../utilities/constants";
+import {useLazyQuery} from "@apollo/react-hooks";
+import {GET_LOGGED_IN_USER} from "../../../graphql/queries";
+import showUnAuthModal from "../../../components/UnAuthModal";
 
 
 function ExpertiseSkills({skill}) {
@@ -54,7 +57,7 @@ const getUniqCategoryExpertise = (profileSkills) => {
     return uniq_category_expertise;
 }
 
-const Profile = ({profile, user, refetchProfile}: ProfileProps) => {
+const Profile = ({profile, user, refetchProfile, loginUrl, registerUrl}: ProfileProps) => {
     const router = useRouter();
     const {personSlug} = router.query;
     const isCurrentUser = (id: string) => {
@@ -65,77 +68,104 @@ const Profile = ({profile, user, refetchProfile}: ProfileProps) => {
         refetchProfile({personSlug});
     }, []);
 
-    let uniqCategoryExpertise = getUniqCategoryExpertise(profile.skills)
+    let uniqCategoryExpertise = getUniqCategoryExpertise(profile.skills);
+
+    const  [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
+        fetchPolicy: "network-only",
+        notifyOnNetworkStatusChange: true,
+        onCompleted() {
+            router.push(`/${personSlug}/edit`);
+        },
+        onError(e) {
+            if(e.message === "The person is undefined, please login to perform this action") {
+                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
+            }
+        },
+
+    });
+
+    const editProfile = () => {
+        checkLoggedInUser();
+    }
+
 
     return (
         <div className="portfolio-profile" >
-            <Row style={{position: 'relative'}}>
-                <Col style={{width: '100%'}}>
-                    <Row justify="center">
-                        <Avatar size={100} icon={<UserOutlined/>} src={apiDomain + profile.avatar}/>
-                    </Row>
-                </Col>
-                <Col style={{position: 'absolute', right: 0}}>
-                    <Row justify={"end"}>
-                        {
-                            isCurrentUser(profile.id) &&
-                            <Button style={{border: "none"}}
-                                    size={"large"}
-                                    shape="circle"
-                                    onClick={() => router.push(`/${personSlug}/edit`)}
-                                    icon={<EditOutlined/>}
-                            />
-                        }
-                    </Row>
-                </Col>
-            </Row>
-            <div style={{padding: 14}}>
-                <Row>
-                    <Typography.Text strong style={{
-                        color: "#262626",
-                        fontSize: 20,
-                        fontFamily: "Roboto"
-                    }}>{profile.firstName}</Typography.Text>
-                </Row>
-                <Row>
-                    <Typography.Text style={{
-                        color: "#595959",
-                        fontSize: 12,
-                        fontFamily: "Roboto"
-                    }}>@{profile.slug}</Typography.Text>
-                </Row>
-                <Row>
-                    <Typography.Text style={{
-                        maxWidth: 232,
-                        color: "#595959"
-                    }}
-                    >{profile.bio}</Typography.Text>
-                </Row>
-                <Row><Divider/></Row>
-                {uniqCategoryExpertise.length > 0 && (<Row justify={"start"}>
-                    <Col>
-                        <Row>
-                            <Typography.Text strong
-                                            style={{
-                                                fontSize: 14,
-                                                fontFamily: "Roboto",
-                                                color: "#262626"
-                                            }}>Skills</Typography.Text>
-                        </Row>
-                        <Row>
-                            {uniqCategoryExpertise && uniqCategoryExpertise.map((skill) =>
-                                <ExpertiseSkills skill={skill}/>
-                            )}
+            <Spin
+                tip="Loading..."
+                spinning={checkLoggedInUserLoading}
+                delay={200}
+            >
+                <Row style={{position: 'relative'}}>
+                    <Col style={{width: '100%'}}>
+                        <Row justify="center">
+                            <Avatar size={100} icon={<UserOutlined/>} src={apiDomain + profile.avatar}/>
                         </Row>
                     </Col>
-                </Row>)}
-            </div>
+                    <Col style={{position: 'absolute', right: 0}}>
+                        <Row justify={"end"}>
+                            {
+                                isCurrentUser(profile.id) &&
+                                <Button style={{border: "none"}}
+                                        size={"large"}
+                                        shape="circle"
+                                        onClick={editProfile}
+                                        icon={<EditOutlined/>}
+                                />
+                            }
+                        </Row>
+                    </Col>
+                </Row>
+                <div style={{padding: 14}}>
+                    <Row>
+                        <Typography.Text strong style={{
+                            color: "#262626",
+                            fontSize: 20,
+                            fontFamily: "Roboto"
+                        }}>{profile.firstName}</Typography.Text>
+                    </Row>
+                    <Row>
+                        <Typography.Text style={{
+                            color: "#595959",
+                            fontSize: 12,
+                            fontFamily: "Roboto"
+                        }}>@{profile.slug}</Typography.Text>
+                    </Row>
+                    <Row>
+                        <Typography.Text style={{
+                            maxWidth: 232,
+                            color: "#595959"
+                        }}
+                        >{profile.bio}</Typography.Text>
+                    </Row>
+                    <Row><Divider/></Row>
+                    {uniqCategoryExpertise.length > 0 && (<Row justify={"start"}>
+                        <Col>
+                            <Row>
+                                <Typography.Text strong
+                                                style={{
+                                                    fontSize: 14,
+                                                    fontFamily: "Roboto",
+                                                    color: "#262626"
+                                                }}>Skills</Typography.Text>
+                            </Row>
+                            <Row>
+                                {uniqCategoryExpertise && uniqCategoryExpertise.map((skill) =>
+                                    <ExpertiseSkills skill={skill}/>
+                                )}
+                            </Row>
+                        </Col>
+                    </Row>)}
+                </div>
+            </Spin>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    user: state.user
+    user: state.user,
+    loginUrl: state.work.loginUrl,
+    registerUrl: state.work.registerUrl,
 });
 
 export default connect(mapStateToProps, null)(Profile);

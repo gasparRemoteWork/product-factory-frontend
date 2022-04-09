@@ -666,3 +666,7 @@ p:last-child {
 .ant-avatar {
   min-width: auto !important;
 }
+
+.full-width {
+    width: 100%;
+}

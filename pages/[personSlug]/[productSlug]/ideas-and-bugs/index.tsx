@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {Col, Radio, Row, Typography, Button, Empty, message} from 'antd';
-import {useQuery} from '@apollo/react-hooks';
+import {Col, Radio, Row, Typography, Button, Empty, Spin} from 'antd';
+import {useQuery, useLazyQuery} from '@apollo/react-hooks';
 import {connect} from 'react-redux';
 import parse from "html-react-parser";
-import {GET_PRODUCT_IDEAS, GET_PRODUCT_BUGS} from '../../../../graphql/queries';
+import {GET_PRODUCT_IDEAS, GET_PRODUCT_BUGS, GET_LOGGED_IN_USER} from '../../../../graphql/queries';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
 import {RadioChangeEvent} from "antd/es";
 import Link from "next/link";
@@ -117,12 +117,27 @@ const IdeasAndBugs: React.FunctionComponent<Props> = (props: Props) => {
 
   const ideaMode = mode === "idea";
 
-  const addAction = () => {
-    if (user.isLoggedIn) {
+  const  [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+    onCompleted() {
       ideaMode ? setIdeaShowAddModal(true) : setBugShowAddModal(true);
-    } else {
-      showUnAuthModal(`Create a new ${mode}`, loginUrl, registerUrl);
-    }
+    },
+    onError(e) {
+        if(e.message === "The person is undefined, please login to perform this action") {
+            showUnAuthModal(`Create a new ${mode}`, loginUrl, registerUrl, true);
+        }
+    },
+
+  });
+
+  const addAction = () => {
+    checkLoggedInUser();
+    // if (user.isLoggedIn) {
+    //   ideaMode ? setIdeaShowAddModal(true) : setBugShowAddModal(true);
+    // } else {
+    //   showUnAuthModal(`Create a new ${mode}`, loginUrl, registerUrl);
+    // }
   };
 
   if (ideasLoading || bugsLoading) return <Loading/>;
@@ -134,47 +149,53 @@ const IdeasAndBugs: React.FunctionComponent<Props> = (props: Props) => {
           <meta name="description" content="Ideas & Bugs" />
         </Head>
     <LeftPanelContainer>
-      <div className="mb-15 d-flex-justify">
-        <Radio.Group
-          onChange={(e: RadioChangeEvent) => setMode(e.target.value)}
-          value={mode}
-          style={{marginBottom: 20}}
+      <Spin
+            tip="Loading..."
+            spinning={checkLoggedInUserLoading}
+            delay={200}
         >
-          <Radio.Button value="idea"
-                        style={{borderRadius: "5px 0 0 5px"}}>Ideas</Radio.Button>
-          <Radio.Button value="bug"
-                        style={{borderRadius: "0 5px 5px 0"}}>Bugs</Radio.Button>
-        </Radio.Group>
-        <Button
-          className="text-right add-task-btn"
-          style={{marginLeft: "auto"}}
-          onClick={() => addAction()}
-        >
-          Add {ideaMode ? "Idea" : "Bug"}
-        </Button>
-      </div>
-      <>
-        {ideaMode
-          ? ItemList(ideas?.ideas || [], "ideas", personSlug, productSlug, user)
-          : ItemList(bugs?.bugs || [], "bugs", personSlug, productSlug, user)
+        <div className="mb-15 d-flex-justify">
+          <Radio.Group
+            onChange={(e: RadioChangeEvent) => setMode(e.target.value)}
+            value={mode}
+            style={{marginBottom: 20}}
+          >
+            <Radio.Button value="idea"
+                          style={{borderRadius: "5px 0 0 5px"}}>Ideas</Radio.Button>
+            <Radio.Button value="bug"
+                          style={{borderRadius: "0 5px 5px 0"}}>Bugs</Radio.Button>
+          </Radio.Group>
+          <Button
+            className="text-right add-task-btn"
+            style={{marginLeft: "auto"}}
+            onClick={() => addAction()}
+          >
+            Add {ideaMode ? "Idea" : "Bug"}
+          </Button>
+        </div>
+        <>
+          {ideaMode
+            ? ItemList(ideas?.ideas || [], "ideas", personSlug, productSlug, user)
+            : ItemList(bugs?.bugs || [], "bugs", personSlug, productSlug, user)
+          }
+        </>
+        {showBugAddModal &&
+          <AddEditBug
+              modal={showBugAddModal}
+              productSlug={productSlug}
+              closeModal={setBugShowAddModal}
+              submit={refetchBugs}
+          />
         }
-      </>
-      {showBugAddModal &&
-        <AddEditBug
-            modal={showBugAddModal}
-            productSlug={productSlug}
-            closeModal={setBugShowAddModal}
-            submit={refetchBugs}
-        />
-      }
-      {showIdeaAddModal &&
-        <AddEditIdea
-            modal={showIdeaAddModal}
-            productSlug={productSlug}
-            closeModal={setIdeaShowAddModal}
-            submit={refetchIdeas}
-        />
-      }
+        {showIdeaAddModal &&
+          <AddEditIdea
+              modal={showIdeaAddModal}
+              productSlug={productSlug}
+              closeModal={setIdeaShowAddModal}
+              submit={refetchIdeas}
+          />
+        }
+      </Spin>
     </LeftPanelContainer>
         </>
   );

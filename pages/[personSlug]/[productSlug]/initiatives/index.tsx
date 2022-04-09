@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {Col, Button} from 'antd';
+import {Col, Button, Spin} from 'antd';
 import {useRouter} from 'next/router'
-import {useQuery} from '@apollo/react-hooks';
-import {GET_INITIATIVES} from '../../../../graphql/queries';
+import {useQuery, useLazyQuery} from '@apollo/react-hooks';
+import {GET_INITIATIVES, GET_LOGGED_IN_USER} from '../../../../graphql/queries';
 import {getUserRole, hasManagerRoots, randomKeys} from '../../../../utilities/utils';
 import AddInitiative from '../../../../components/Products/AddInitiative';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
@@ -13,13 +13,17 @@ import InitiativeTable from "../../../../components/InitiativeTable";
 import {FilterOutlined} from "@ant-design/icons";
 import InitiativeFilterModal from "../../../../components/InitiativeFilterModal";
 import Loading from "../../../../components/Loading";
-import Head from "next/head"
+import Head from "next/head";
+import showUnAuthModal from "../../../../components/UnAuthModal";
+
 
 type Params = {
   user: any,
+  loginUrl: string,
+  registerUrl: string
 };
 
-const InitiativeList: React.FunctionComponent<Params> = ({user}) => {
+const InitiativeList: React.FunctionComponent<Params> = ({user, loginUrl, registerUrl}) => {
   const router = useRouter();
   const [filterModal, setFilterModal] = useState(false);
   let {productSlug, personSlug} = router.query;
@@ -44,6 +48,20 @@ const InitiativeList: React.FunctionComponent<Params> = ({user}) => {
     setFilterModal(false);
   }
 
+  const  [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+    onCompleted() {
+      setShowEditModal(!showEditModal);
+    },
+    onError(e) {
+        if(e.message === "The person is undefined, please login to perform this action") {
+            showUnAuthModal("create a new initiative", loginUrl, registerUrl, true);
+        }
+    },
+
+  });
+
   return (
       <>
         <Head>
@@ -54,44 +72,50 @@ const InitiativeList: React.FunctionComponent<Params> = ({user}) => {
       {
         !error && (
           <React.Fragment key={randomKeys()}>
-            {loading ? <Loading /> :
-              <InitiativeTable
-                initiatives={data?.initiatives ? data.initiatives : []}
-                content={<div className="d-flex-justify-center">
-                  {userHasManagerRoots && (
-                    <Col>
-                      <Button
-                        className="ml-10"
-                        onClick={() => setShowEditModal(!showEditModal)}
-                      >
-                        Add new initiative
-                      </Button>
-                    </Col>
-                  )}
-                  <Button
-                    type="primary"
-                    onClick={() => setFilterModal(!filterModal)}
-                    icon={<FilterOutlined/>}
-                  >Filter</Button>
-                </div>}
-                personSlug={personSlug}
-                productSlug={productSlug} />}
-            {
-              showEditModal &&
-              <AddInitiative
-                  modal={showEditModal}
-                  productSlug={productSlug}
-                  modalType={false}
-                  closeModal={setShowEditModal}
-                  submit={() => refetch()}
+            <Spin
+              tip="Loading..."
+              spinning={checkLoggedInUserLoading}
+              delay={200}
+            >
+              {loading ? <Loading /> :
+                <InitiativeTable
+                  initiatives={data?.initiatives ? data.initiatives : []}
+                  content={<div className="d-flex-justify-center">
+                    {userHasManagerRoots && (
+                      <Col>
+                        <Button
+                          className="ml-10"
+                          onClick={() => checkLoggedInUser()}
+                        >
+                          Add new initiative
+                        </Button>
+                      </Col>
+                    )}
+                    <Button
+                      type="primary"
+                      onClick={() => setFilterModal(!filterModal)}
+                      icon={<FilterOutlined/>}
+                    >Filter</Button>
+                  </div>}
+                  personSlug={personSlug}
+                  productSlug={productSlug} />}
+              {
+                showEditModal &&
+                <AddInitiative
+                    modal={showEditModal}
+                    productSlug={productSlug}
+                    modalType={false}
+                    closeModal={setShowEditModal}
+                    submit={() => refetch()}
+                />
+              }
+              <InitiativeFilterModal
+                modal={filterModal}
+                initialForm={inputData}
+                closeModal={() => setFilterModal(false)}
+                submit={applyFilter}
               />
-            }
-            <InitiativeFilterModal
-              modal={filterModal}
-              initialForm={inputData}
-              closeModal={() => setFilterModal(false)}
-              submit={applyFilter}
-            />
+            </Spin>
           </React.Fragment>
         )
       }
@@ -102,6 +126,8 @@ const InitiativeList: React.FunctionComponent<Params> = ({user}) => {
 
 const mapStateToProps = (state: any) => ({
   user: state.user,
+  loginUrl: state.work.loginUrl,
+  registerUrl: state.work.registerUrl,
 });
 
 const mapDispatchToProps = () => ({});

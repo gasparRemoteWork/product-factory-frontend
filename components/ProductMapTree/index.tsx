@@ -154,7 +154,7 @@ const ProductMapTree: React.FunctionComponent<IProductMapTree> = ({
     }
   });
 
-  const  [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
+  const [checkLoggedInUser, { data: loggedInUser, loading: checkLoggedInUserLoading }] = useLazyQuery(GET_LOGGED_IN_USER, {
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     onCompleted() {

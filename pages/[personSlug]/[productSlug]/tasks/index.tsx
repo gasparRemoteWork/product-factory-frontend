@@ -11,6 +11,7 @@ import {TASK_TYPES} from "../../../../graphql/types";
 import Loading from "../../../../components/Loading";
 import {FilterOutlined} from "@ant-design/icons";
 import FilterModal from "../../../../components/FilterModal";
+import {TaskStatuses} from "../../../../utilities/enums";
 import {getUserRole, hasManagerRoots} from "../../../../utilities/utils";
 import Head from "next/head";
 import showUnAuthModal from "../../../../components/UnAuthModal";
@@ -33,6 +34,7 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [filterModal, setFilterModal] = useState(false);
   const [tasks, setTasks] = useState<any>([]);
+  const [tasksDependencies, setTasksDependencies] = useState([]);
   const [inputData, setInputData] = useState({
     sortedBy: "priority",
     statuses,
@@ -45,9 +47,32 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
 
   useEffect(() => {
     if (location.hash === '#available') {
-      setStatuses([2]);
+      setStatuses([TaskStatuses.TASK_STATUS_AVAILABLE]);
     }
   }, []);
+
+  const { data: productTasksData,
+          error: productTasksError,
+          loading: productTasksLoading,
+          refetch: refetchProductTasks
+  } = useQuery(GET_TASKS_BY_PRODUCT, {
+    variables: {
+      productSlug,
+      input: {
+        statuses: Object.values(TaskStatuses).filter(status => status !== TaskStatuses.TASK_STATUS_DONE)
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (!productTasksError && productTasksData) {
+      setTasksDependencies(productTasksData.tasklistingByProduct);
+    }
+  }, [productTasksData]);
+
+  const fetchProductTasks = async () => {
+    await refetchProductTasks({ productSlug });
+  }
 
   const productsVariable = {
     productSlug,
@@ -61,7 +86,8 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
 
   const closeTaskModal = (flag: boolean) => {
     setShowAddTaskModal(flag);
-    refetch(productsVariable);
+    fetchTasks();
+    fetchProductTasks();
   };
 
   const applyFilter = (values: any) => {
@@ -127,8 +153,8 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
                 <AddTask
                   modal={showAddTaskModal}
                   closeModal={closeTaskModal}
-                  tasks={tasks}
-                  submit={fetchTasks}
+                  tasks={tasksDependencies ?? []}
+                  submit={() => {fetchTasks(); fetchProductTasks()}}
                   productSlug={String(productSlug)}
                 />
               </Col>

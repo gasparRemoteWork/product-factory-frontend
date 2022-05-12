@@ -17,6 +17,7 @@ import ReactPlayer from "react-player";
 import {
   GET_CAPABILITY_BY_ID,
   GET_CAPABILITY_PARENT_CRUMBS,
+  GET_TASKS_BY_PRODUCT,
 } from "../../../../graphql/queries";
 import { DELETE_CAPABILITY } from "../../../../graphql/mutations";
 import { TagType, TASK_TYPES } from "../../../../graphql/types";
@@ -35,6 +36,7 @@ import Loading from "../../../../components/Loading";
 import { DownOutlined, FilterOutlined } from "@ant-design/icons";
 import CheckableTag from "antd/lib/tag/CheckableTag";
 import FilterModal from "../../../../components/FilterModal";
+import { TaskStatuses } from "../../../../utilities/enums";
 import { getUserRole, hasManagerRoots } from "../../../../utilities/utils";
 import { connect } from "react-redux";
 import parse from "html-react-parser";
@@ -131,6 +133,7 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
 
   const [capability, setCapability] = useState({});
   const [tasks, setTasks] = useState([]);
+  const [tasksDependencies, setTasksDependencies] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [filterModal, setFilterModal] = useState(false);
   const [formattedCrumbs, setFormattedCrumbs] = useState<Array<ICrumb>>([]);
@@ -143,7 +146,7 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
 
   const [inputData, setInputData] = useState({
     sortedBy: "priority",
-    statuses: [2],
+    statuses: [TaskStatuses.TASK_STATUS_AVAILABLE],
     tags: [],
     priority: [],
     assignee: [],
@@ -157,12 +160,36 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
 
   const closeTaskModal = (flag: boolean) => {
     setShowAddTaskModal(flag);
-    refetch(productsVariable);
+    fetchTasks();
+    fetchProductTasks();
   };
 
   const { data, error, loading, refetch } = useQuery(GET_CAPABILITY_BY_ID, {
     variables: { nodeId: capabilityId, input: inputData },
   });
+
+  const { data: productTasksData,
+          error: productTasksError,
+          loading: productTasksLoading,
+          refetch: refetchProductTasks
+  } = useQuery(GET_TASKS_BY_PRODUCT, {
+    variables: {
+      productSlug, 
+      input: {
+        statuses: Object.values(TaskStatuses).filter(status => status !== TaskStatuses.TASK_STATUS_DONE)
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (!productTasksError && productTasksData) {
+      setTasksDependencies(productTasksData.tasklistingByProduct);
+    }
+  }, [productTasksData])
+
+  const fetchProductTasks = async () => {
+    await refetchProductTasks({ productSlug });
+  }
 
   const { data: crumbs, error: crumbsError, loading: crumbsLoading } = useQuery(
     GET_CAPABILITY_PARENT_CRUMBS,
@@ -317,9 +344,9 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
                         <AddTask
                           modal={showAddTaskModal}
                           closeModal={closeTaskModal}
-                          tasks={tasks}
+                          tasks={tasksDependencies ?? []}
                           capabilityID={capabilityId}
-                          submit={fetchTasks}
+                          submit={() => {fetchTasks(); fetchProductTasks()}}
                           productSlug={String(productSlug)}
                         />
                       </>

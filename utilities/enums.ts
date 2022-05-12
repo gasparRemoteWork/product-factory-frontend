@@ -1,0 +1,8 @@
+export const TaskStatuses = {
+    TASK_STATUS_DRAFT: 0,
+    TASK_STATUS_BLOCKED: 1,
+    TASK_STATUS_AVAILABLE: 2,
+    TASK_STATUS_CLAIMED: 3,
+    TASK_STATUS_DONE: 4,
+    TASK_STATUS_IN_REVIEW: 5,
+};

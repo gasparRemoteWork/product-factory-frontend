@@ -4,12 +4,13 @@ import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {Row, Col, message, Button} from 'antd';
 import {useQuery, useMutation} from '@apollo/react-hooks';
-import {GET_INITIATIVE_BY_ID} from '../../../../graphql/queries';
+import {GET_INITIATIVE_BY_ID, GET_TASKS_BY_PRODUCT} from '../../../../graphql/queries';
 import {DELETE_INITIATIVE} from '../../../../graphql/mutations';
 import DeleteModal from '../../../../components/Products/DeleteModal';
 import AddInitiative from '../../../../components/Products/AddInitiative';
 import {TaskTable, DynamicHtml} from '../../../../components';
 import {getProp} from '../../../../utilities/filters';
+import {TaskStatuses} from "../../../../utilities/enums";
 import {getUserRole, hasManagerRoots, randomKeys} from '../../../../utilities/utils';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
 import Loading from "../../../../components/Loading";
@@ -46,9 +47,10 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, loginUrl, regi
   const [deleteModal, showDeleteModal] = useState(false);
   const [filterModal, setFilterModal] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [tasksDependencies, setTasksDependencies] = useState([]);
   const [inputData, setInputData] = useState({
     sortedBy: "priority",
-    statuses: [2],
+    statuses: [TaskStatuses.TASK_STATUS_AVAILABLE],
     tags: [],
     priority: [],
     categories: [],
@@ -92,10 +94,34 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, loginUrl, regi
     input: inputData
   };
 
+  const { data: productTasksData,
+          error: productTasksError,
+          loading: productTasksLoading,
+          refetch: refetchProductTasks
+  } = useQuery(GET_TASKS_BY_PRODUCT, {
+    variables: {
+      productSlug,
+      input: {
+        statuses: Object.values(TaskStatuses).filter(status => status !== TaskStatuses.TASK_STATUS_DONE)
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (!productTasksError && productTasksData) {
+      setTasksDependencies(productTasksData.tasklistingByProduct);
+    }
+  }, [productTasksData]);
+
+  const fetchProductTasks = async () => {
+    await refetchProductTasks({ productSlug });
+  }
+
    const closeTaskModal = (flag: boolean) => {
-    setShowAddTaskModal(flag);
-    refetch(productsVariable);
-  };
+      setShowAddTaskModal(flag);
+      fetchTasks();
+      fetchProductTasks();
+   };
 
   useEffect(() => {
     if (original && original.initiative) {
@@ -183,24 +209,26 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, loginUrl, regi
                                style={{padding: "0 10px"}}
                                onClick={() => setFilterModal(!filterModal)}
                                icon={<FilterOutlined />}>Filter</Button>
-
-                                {userHasManagerRoots && (<><Button
-                                className="text-right add-task-btn mb-15 ml-15"
-                                onClick={() => setShowAddTaskModal(true)}
-                                >Add Task</Button>
-
-                                <AddTask
-                                    modal={showAddTaskModal}
-                                    closeModal={closeTaskModal}
-                                    tasks={tasks}
-                                    initiativeID={initiativeId}
-                                    submit={fetchTasks}
-                                    productSlug={String(productSlug)}
-                                  /></>)}
-
-                                </Col>}
-                                submit={fetchData}
-                              />
+                              { userHasManagerRoots &&
+                                <>
+                                  <Button
+                                    className="text-right add-task-btn mb-15 ml-15"
+                                    onClick={() => setShowAddTaskModal(true)}>
+                                      Add Task
+                                  </Button>
+                                  <AddTask
+                                      modal={showAddTaskModal}
+                                      closeModal={closeTaskModal}
+                                      tasks={tasksDependencies ?? []}
+                                      initiativeID={initiativeId}
+                                      submit={() => {fetchTasks(); fetchProductTasks()}}
+                                      productSlug={String(productSlug)}
+                                    />
+                                </>
+                              }
+                      </Col>}
+              submit={fetchData}
+            />
             {deleteModal && (
               <DeleteModal
                 modal={deleteModal}

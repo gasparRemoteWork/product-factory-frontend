@@ -123,7 +123,7 @@ export const GET_TASKS = gql`
         owner
         videoUrl
       }
-      task {
+      challenge {
         id
         priority
       }
@@ -415,7 +415,7 @@ export const GET_TASK_BY_ID = gql`
         id
         title
         description
-        category {
+        skill {
           id
           name
         }
@@ -454,7 +454,7 @@ export const GET_TASKS_BY_PRODUCT = gql`
         owner
         videoUrl
       }
-      task {
+      challenge {
         id
         priority
       }
@@ -483,7 +483,7 @@ export const GET_TASKS_BY_PRODUCT_SHORT = gql`
       id
       publishedId      
       title
-      task {
+      challenge {
         id
       }
     }
@@ -965,7 +965,7 @@ export const GET_CONTRIBUTOR_GUIDES = gql`
       id
       title
       description
-      category {
+      skill {
         id
         name
       }

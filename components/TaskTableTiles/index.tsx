@@ -96,7 +96,7 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
                           <PlaySquareOutlined className="pointer mr-10"
                                               onClick={() => showVideoModal(taskVideoUrl)} />}
                     <Link
-                      href={`/${owner}/${productSlug}/tasks/${taskListing.publishedId}`}
+                      href={`/${owner}/${productSlug}/challenges/${taskListing.publishedId}`}
                     >
                       {taskListing.title}
                     </Link>

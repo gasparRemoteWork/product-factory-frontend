@@ -10,7 +10,7 @@ const { TabPane } = Tabs;
 
 
 const Dashboard: React.FunctionComponent = () => {
-  const [tabkey, setTabkey] = useState("tasks");
+  const [tabkey, setTabkey] = useState("challenges");
   const [filterModal, setFilterModal] = useState(false);
   const [createPersonModal, setCreatePersonModal] = useState<boolean>(false);
 
@@ -40,8 +40,8 @@ const Dashboard: React.FunctionComponent = () => {
           onChange={onChnageKey}
           value={tabkey}
         >
-          <Option key="tasks" value="tasks">
-            Tasks
+          <Option key="challenges" value="challenges">
+            Challenges
           </Option>
           <Option key="products" value="products">
             Products
@@ -57,7 +57,7 @@ const Dashboard: React.FunctionComponent = () => {
             onChange={onChnageKey}
             tabBarExtraContent={extraTabButtons()}
           >
-            <TabPane tab="Tasks" key="tasks">
+            <TabPane tab="Challenges" key="challenges">
               <TaskTab
                 showInitiativeName={true}
                 showProductName={true}

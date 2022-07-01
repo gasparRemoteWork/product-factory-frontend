@@ -26,7 +26,7 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
 
   const params: any = matchPath(match.url, {
-    path: "/products/:productSlug/tasks",
+    path: "/products/:productSlug/challenges",
     exact: false,
     strict: false
   });

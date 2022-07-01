@@ -105,7 +105,7 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
   return (
       <>
         <Head>
-          <title>Tasks</title>
+          <title>Challenges</title>
           <meta name="description" content="Tasks" />
         </Head>
     <LeftPanelContainer>
@@ -122,7 +122,7 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
                   className="text-right add-task-btn mb-15"
                   onClick={() => { showAddTask() }}
                 >
-                  Add Task
+                  Add Challenge
                 </Button>
                 <AddTask
                   modal={showAddTaskModal}

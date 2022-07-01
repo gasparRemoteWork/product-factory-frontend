@@ -122,10 +122,10 @@ const Summary: React.FunctionComponent = () => {
                       data,
                       "product.owner",
                       ""
-                    )}/${productSlug}/tasks#available`}
+                    )}/${productSlug}/challenges#available`}
                   >
                     <Typography.Link strong style={{ fontSize: "1.1rem" }}>
-                      {availableTasksAmount} Available Tasks
+                      {availableTasksAmount} Available Challenges
                     </Typography.Link>
                   </Link>
                 </Col>
@@ -152,7 +152,7 @@ const Summary: React.FunctionComponent = () => {
                           </Link>
                           &nbsp;
                           {`(${capability.availableTaskNum}/${capability.taskSet.length} 
-                            Available Tasks ${capability.availableTaskNum})`}
+                            Available Challenges ${capability.availableTaskNum})`}
                         </Col>
                       );
                     }

@@ -89,7 +89,7 @@ const ProfileItem: React.FunctionComponent = () => {
       render: (task: any) => (
         <div style={{width: 200}}>
           <div>
-            <Link href={`/${getProp(review, 'review.review.product.owner', '')}/${getProp(review, 'review.review.product.slug', '')}/tasks/${task.id}`}>
+            <Link href={`/${getProp(review, 'review.review.product.owner', '')}/${getProp(review, 'review.review.product.slug', '')}/challenges/${task.id}`}>
               <a className="text-grey-9">{task.title}</a>
             </Link>
           </div>

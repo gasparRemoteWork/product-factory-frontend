@@ -60,7 +60,7 @@ import DeliveryMessageModal from "../../../../components/Products/DeliveryMessag
 
 const {Panel} = Collapse;
 
-const actionName = "Claim the task";
+const actionName = "Claim the challenge";
 
 type Params = {
     user?: any;
@@ -155,7 +155,7 @@ const Task: React.FunctionComponent<Params> = ({
         },
         onCompleted() {
             message.success("Item is successfully deleted!").then();
-            router.push(getBasePath() === "" ? "/" : `${getBasePath()}/tasks`).then();
+            router.push(getBasePath() === "" ? "/" : `${getBasePath()}/challenges`).then();
         },
         onError(e) {
             if(e.message === "The person is undefined, please login to perform this action") {
@@ -563,7 +563,7 @@ const Task: React.FunctionComponent<Params> = ({
                         <>
                             <div className="flex-column ml-auto mt-10">
                                 <Button type="primary" onClick={() => claimTaskEvent()}>
-                                    Claim the task
+                                    Claim the challenge
                                 </Button>
                                 {contributionGuide && (
                                 <>
@@ -659,7 +659,7 @@ const Task: React.FunctionComponent<Params> = ({
                                         <a href={getBasePath()}>{getProp(product, "name", "")}</a>
                                     </Breadcrumb.Item>
                                     <Breadcrumb.Item>
-                                        <a href={`${getBasePath()}/tasks`}>Tasks</a>
+                                        <a href={`${getBasePath()}/challenges`}>Challenges</a>
                                     </Breadcrumb.Item>
                                     {initiativeName && (
                                         <Breadcrumb.Item>
@@ -903,7 +903,7 @@ const Task: React.FunctionComponent<Params> = ({
                                             renderItem={(item: any) => (
                                                 <List.Item>
                                                     <Link
-                                                        href={`/${personSlug}/${item.product.slug}/tasks/${item.publishedId}`}
+                                                        href={`/${personSlug}/${item.product.slug}/challenges/${item.publishedId}`}
                                                     >
                                                         {item.title}
                                                     </Link>
@@ -922,7 +922,7 @@ const Task: React.FunctionComponent<Params> = ({
                                             renderItem={(item: any) => (
                                                 <List.Item>
                                                     <Link
-                                                        href={`/${personSlug}/${item.product.slug}/tasks/${item.publishedId}`}
+                                                        href={`/${personSlug}/${item.product.slug}/challenges/${item.publishedId}`}
                                                     >
                                                         {item.title}
                                                     </Link>

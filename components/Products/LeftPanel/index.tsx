@@ -39,7 +39,7 @@ const LeftPanel: React.FunctionComponent<ILeftPanelProps> = ({user}): any => {
   let links: ILink[] = [
     {url: '/', type: 'summary', name: 'Summary'},
     {url: '/initiatives', type: 'initiatives', name: 'Initiatives'},
-    {url: '/tasks', type: 'tasks', name: 'Tasks'},
+    {url: '/challenges', type: 'tasks', name: 'Challenges'},
     {url: '/capabilities', type: 'capabilities', name: 'Product Tree'},
     {url: '/ideas-and-bugs', type: 'ideas-and-bugs', name: 'Ideas & Bugs'},
     {url: '/people', type: 'people', name: 'People'}

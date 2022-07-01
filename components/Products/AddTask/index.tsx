@@ -474,7 +474,7 @@ const AddTask: React.FunctionComponent<Props> = (
     return (
         <>
             <Modal
-                title={`${modalType ? "Edit" : "Add"} Task`}
+                title={`${modalType ? "Edit" : "Add"} Challenge`}
                 visible={modal}
                 onOk={handleOk}
                 onCancel={handleCancel}
@@ -665,7 +665,7 @@ const AddTask: React.FunctionComponent<Props> = (
                     >
                         {tasks &&
                         tasks.map((option: any, idx: number) => (
-                            <Option key={`cap${idx}`} value={option.task.id}>
+                            <Option key={`cap${idx}`} value={option.challenge.id}>
                                 {option.title}
                             </Option>
                         ))}

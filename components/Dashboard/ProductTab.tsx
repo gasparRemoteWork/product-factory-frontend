@@ -22,7 +22,7 @@ const ProductTab: React.FunctionComponent = () => {
 
   const getAvailableTaskText = (availableTasks: number) => {
     if (availableTasks === 0) return "";
-    return `${availableTasks} available ${pluralize("task", availableTasks)}`;
+    return `${availableTasks} available ${pluralize("challenge", availableTasks)}`;
   }
 
   const getAvailableInitiativeText = (initiatives: number) => {
@@ -79,7 +79,7 @@ const ProductTab: React.FunctionComponent = () => {
                     bottom: 16
                   }}>
                     {availableTasks > 0 && (
-                      <Link href={`/${getProp(product, "owner", "products")}/${product.slug}/tasks`}>
+                      <Link href={`/${getProp(product, "owner", "products")}/${product.slug}/challenges`}>
                         <div>
                           <img
                             src={CheckCircle}

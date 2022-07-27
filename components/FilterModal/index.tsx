@@ -130,9 +130,9 @@ const FilterModal: React.FunctionComponent<Props> = ({
               {TASK_PRIORITIES.map((p: string, index: number) => <Option key={p} value={index}>{p}</Option>)}
             </Select>
           </Form.Item>
-          <Form.Item name="categories" label="Category">
+          <Form.Item name="categories" label="Skill">
             <Select
-              placeholder="Specify category"
+              placeholder="Specify skill"
               mode="multiple"
               showSearch={true}
               filterOption={filterOption}

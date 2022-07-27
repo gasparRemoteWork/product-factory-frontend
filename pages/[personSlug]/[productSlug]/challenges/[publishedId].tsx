@@ -24,12 +24,14 @@ import {
     GET_TASK_BY_ID,
     GET_TASKS_BY_PRODUCT_SHORT,
     GET_LOGGED_IN_USER,
+    GET_CATEGORIES_LIST,
+    GET_EXPERTISES_LIST
 } from "../../../../graphql/queries";
 import {TASK_TYPES, USER_ROLES} from "../../../../graphql/types";
 import {
     ACCEPT_AGREEMENT,
     CLAIM_TASK,
-    DELETE_TASK,
+    DELETE_CHALLENGE,
     IN_REVIEW_TASK,
     LEAVE_TASK,
     REJECT_TASK,
@@ -57,6 +59,7 @@ import Head from "next/head";
 import ToReviewModal from "../../../../components/Products/ToReviewModal";
 import {UploadFile} from "antd/es/upload/interface";
 import DeliveryMessageModal from "../../../../components/Products/DeliveryMessageModal";
+import BountyTable from "../../../../components/Products/Bounty/BountyTable";
 
 const {Panel} = Collapse;
 
@@ -96,6 +99,53 @@ const Task: React.FunctionComponent<Params> = ({
     const [tasks, setTasks] = useState([]);
     const [license, setLicense] = useState("");
     const [actionName, setActionName] = useState("");
+
+    const [allSkills, setAllSkills] = React.useState([]);
+    const [allExpertises, setAllExpertises] = React.useState([]);
+
+    const {data: categories} = useQuery(GET_CATEGORIES_LIST);
+    const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
+
+    useEffect(() => {
+        if (categories?.taskCategoryListing) {
+            setAllSkills(JSON.parse(categories.taskCategoryListing));
+        }
+    }, [categories]);
+
+    useEffect(() => {
+        if (expertises?.expertisesListing) {
+            setAllExpertises(JSON.parse(expertises.expertisesListing));
+        }
+    }, [expertises]);
+
+    const getSkillParent = (skillId): string => {
+        let parentName = "N/A";
+
+        for(let skill of allSkills) {
+            for(let childSkill of skill.children) {
+                if(childSkill.id == skillId) return skill.name
+            }
+        }
+
+        return "N/A";
+    }
+
+    const isBountyClaimedByUser = (bounty) => {
+        let allBountyClaims = task.bountyClaim;
+        let isClaimed = false;
+
+        for(let bountyClaim of allBountyClaims) {
+            if(bountyClaim.kind == 1 && 
+                bountyClaim.bounty.id == bounty.id && 
+                bountyClaim.person.id == user.id) {
+                
+                isClaimed = true;
+                break;
+            }
+        }
+
+        return isClaimed;
+    }
 
     const [isContributionGuideVisible, setIsContributionGuideVisible] = useState(false);
     const showCotributionGuide = () => {
@@ -149,7 +199,7 @@ const Task: React.FunctionComponent<Params> = ({
         return `/${personSlug}/${productSlug}`;
     };
 
-    const [deleteTask] = useMutation(DELETE_TASK, {
+    const [deleteChallenge] = useMutation(DELETE_CHALLENGE, {
         variables: {
             id: taskId,
         },
@@ -332,7 +382,6 @@ const Task: React.FunctionComponent<Params> = ({
     }, [licenseOriginal]);
 
     const [claimTask, {loading: claimTaskLoading}] = useMutation(CLAIM_TASK, {
-        variables: {taskId},
         onCompleted(data) {
             const {claimTask} = data;
             const responseMessage = claimTask.message;
@@ -344,7 +393,6 @@ const Task: React.FunctionComponent<Params> = ({
                 if (claimTask.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
-                    getPersonData();
                 } else {
                     message
                         .error(
@@ -389,14 +437,15 @@ const Task: React.FunctionComponent<Params> = ({
         },
     });
 
-    const claimTaskEvent = () => {
+    const claimTaskEvent = (bounty, index) => {
+
         let userId = user.id;
         if (userId === undefined || userId === null) {
             showUnAuthModal(actionName, loginUrl, registerUrl, true);
             return;
         }
 
-        claimTask().then();
+        claimTask({ variables: { bountyId: bounty.id }});
     };
 
     const getCausedBy = (assignedTo: any) => {
@@ -553,7 +602,7 @@ const Task: React.FunctionComponent<Params> = ({
                                         onClick={() => showLeaveTaskModal(true)}
                                         style={{zIndex: 1000}}
                                     >
-                                        Leave the task
+                                        Leave the bounty
                                     </Button>
                                 </div>
                             ) : null}
@@ -562,9 +611,9 @@ const Task: React.FunctionComponent<Params> = ({
                     {taskStatus === "Available" && (
                         <>
                             <div className="flex-column ml-auto mt-10">
-                                <Button type="primary" onClick={() => claimTaskEvent()}>
+                                {/* <Button type="primary" onClick={() => claimTaskEvent()}>
                                     Claim the challenge
-                                </Button>
+                                </Button> */}
                                 {contributionGuide && (
                                 <>
                                     <a style={{textAlign: 'center', marginTop: '5px', fontSize: '13px'}} 
@@ -725,6 +774,85 @@ const Task: React.FunctionComponent<Params> = ({
                                         </Col>
                                     </Row>
 
+                                    <Row className="mt-22">
+                                        <label style={{ fontSize: '15', paddingBottom: '10px', fontWeight: '500'}}>Bounty</label>
+
+                                        <Row>
+                                            <Col>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', minWidth: 300}}>
+                                                    Skill
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', minWidth: 300}}>
+                                                    Expertise
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 80}}>
+                                                    Points
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 120}}>
+                                                    Action
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                        {task.bounty && task.bounty.length > 0 && task.bounty.map((bounty, index) => (
+                                        <Row>
+                                            <Col>
+                                                <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
+                                                                alignItems: "center", minWidth: 300, fontWeight: '500' }} key={index}>
+                                                    <Typography.Text style={{
+                                                        fontSize: 13,
+                                                        minWidth: 300,
+                                                        padding: 10,
+                                                        width: "max-content"
+                                                    }}>
+                                                    {getSkillParent(bounty.skill.id).slice(0, 12)}{'...->'}{bounty.skill.name}
+                                                    </Typography.Text>
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
+                                                                alignItems: "center", minWidth: 300, padding: 10, 
+                                                                textTransform: 'capitalize', fontWeight: '500' }} key={index}>
+                                                    {
+                                                        bounty.expertise.map((exp, idx) => { 
+                                                            return  (
+                                                                <span style={{ }}>
+                                                                        {idx>0?', ':''}{exp.name}
+                                                                </span> 
+                                                            )
+                                                        })
+                                                    }
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
+                                                                alignItems: "center", width: 80, 
+                                                                padding: '10px', fontWeight: '500' }} key={index}>
+                                                    {bounty.points}
+                                                </Row>
+                                            </Col>
+                                            <Col>
+                                                <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
+                                                                alignItems: "center", width: 120, 
+                                                                padding: '10px', fontWeight: '500' }} key={index}>
+                                                    {
+                                                        isBountyClaimedByUser(bounty) ?
+                                                        <span style={{ fontSize: 13, }}>Claimed by you</span> :
+                                                        <Button type="primary" onClick={() => claimTaskEvent(bounty, index)}>
+                                                            Claim
+                                                        </Button>                                                        
+                                                    }
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                        ))}                                    
+                                    </Row>
+
                                     <div className="mt-22">
                                         {getProp(task, "taskCategory", null) && (
                                             <Row style={{marginTop: 10}} className="text-sm mt-8">
@@ -742,7 +870,7 @@ const Task: React.FunctionComponent<Params> = ({
                                             </Row>
                                         )}
 
-                                        {showAssignedUser()}
+                                        {/* {showAssignedUser()} */}
                                         
                                         <Row style={{marginTop: 10}} className="text-sm mt-8">
                                             <strong className="my-auto">Created By: </strong>

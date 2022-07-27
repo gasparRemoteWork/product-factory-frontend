@@ -76,8 +76,8 @@ export const DELETE_PRODUCT = gql`
   }
 `;
 
-export const CREATE_TASK = gql`
-  mutation CreateTask($input: TaskInput!) {
+export const CREATE_CHALLENGE = gql`
+  mutation CreateChallenge($input: TaskInput!) {
     createTask(input: $input) {
       task {
         title
@@ -88,9 +88,9 @@ export const CREATE_TASK = gql`
   }
 `;
 
-export const UPDATE_TASK = gql`
-  mutation UpdateTask($input: TaskInput!, $id: Int!) {
-    updateTask(input: $input, id: $id) {
+export const UPDATE_CHALLENGE = gql`
+  mutation UpdateChallenge($input: TaskInput!, $id: Int!) {
+    updateChallenge(input: $input, id: $id) {
       task {
         title
       }
@@ -191,9 +191,9 @@ export const DELETE_INITIATIVE = gql`
   }
 `;
 
-export const DELETE_TASK = gql`
-  mutation DeleteTask($id: Int!) {
-    deleteTask(id: $id) {
+export const DELETE_CHALLENGE = gql`
+  mutation DeleteChallenge($id: Int!) {
+    deleteChallenge(id: $id) {
       taskId
       status
     }
@@ -272,8 +272,8 @@ export const LEAVE_TASK = gql`
 `;
 
 export const CLAIM_TASK = gql`
-  mutation ClaimTask($taskId: Int!) {
-    claimTask(taskId: $taskId) {
+  mutation ClaimTask($bountyId: Int!) {
+    claimTask(bountyId: $bountyId) {
       success
       message
       isNeedAgreement

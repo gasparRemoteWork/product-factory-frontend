@@ -102,10 +102,10 @@ const EditProfile = ({profile, setProfile, loginUrl, registerUrl}: EditProfilePr
             const currentSkillExpertise: SkillExpertise[] = [];
             profile.skills.map(skill => {
                 var expertiseSelections = []
-                var skillCat = findCategory(allCategories, skill.category[1])
+                var skillCat = findCategory(allCategories, skill.skill[1])
                 if(allExpertises) {
                    for(var i=0; i<allExpertises.length; i++) {
-                        if(allExpertises[i]['category'] === skillCat.id) {
+                        if(allExpertises[i]['skill'] === skillCat.id) {
                             var childExpertises = []
                             allExpertises[i]['children'].map((child) => {childExpertises.push(child['name'])})
                             expertiseSelections[ allExpertises[i]['name'] ] = childExpertises
@@ -114,7 +114,7 @@ const EditProfile = ({profile, setProfile, loginUrl, registerUrl}: EditProfilePr
                 }
 
                 currentSkillExpertise.push({
-                    skill: skill.category,
+                    skill: skill.skill,
                     expertise: expertiseSelections,
                 });
             });
@@ -182,7 +182,7 @@ const EditProfile = ({profile, setProfile, loginUrl, registerUrl}: EditProfilePr
     const save = () => {
         let newSkills: any[] = [];
         for (let skill of skills) {
-            newSkills.push({category: skill.category, expertise: skill.expertise});
+            newSkills.push({category: skill.skill, expertise: skill.expertise});
         }
         let newWebsites: any[] = [];
         for (let website of websites) {

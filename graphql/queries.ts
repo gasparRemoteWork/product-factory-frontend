@@ -219,7 +219,7 @@ export const GET_CAPABILITY_BY_ID = gql`
           slug
           owner
         }
-        task {
+        challenge {
           id
         }
       }
@@ -313,7 +313,7 @@ query GetInitiative($id: Int!, $input: TaskListInput!) {
         slug
         owner
       }
-      task {
+      challenge {
         id
       }
     }
@@ -372,11 +372,32 @@ export const GET_TASK_BY_ID = gql`
         id
         name
       }
-      taskCategory
-      taskExpertise {
+      bounty {
         id
-        name
+        skill {
+            id
+            name
+        }
+        expertise {
+            id
+            name
+        }
+        points
       }
+      bountyClaim {
+        id
+        kind
+        bounty {
+          id
+        }
+        person {
+            id
+            firstName
+            username
+            slug
+        }
+      }
+      skill
       dependOn {
         id
         title
@@ -989,7 +1010,7 @@ export const GET_TASK_DELIVERY_ATTEMPT = gql`
       },
       taskClaim {
         id
-        task {
+        challenge {
           id, 
           title
         }

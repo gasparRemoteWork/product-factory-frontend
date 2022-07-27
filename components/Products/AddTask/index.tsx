@@ -9,7 +9,7 @@ import {
     GET_USERS,
     GET_EXPERTISES_LIST,
 } from "../../../graphql/queries";
-import {CREATE_TASK, UPDATE_TASK} from "../../../graphql/mutations";
+import {CREATE_CHALLENGE, UPDATE_CHALLENGE} from "../../../graphql/mutations";
 import {TASK_TYPES, TASK_PRIORITIES} from "../../../graphql/types";
 import AddInitiative from "../AddInitiative";
 import {PlusOutlined, MinusOutlined} from "@ant-design/icons";
@@ -17,6 +17,9 @@ import {RICH_TEXT_EDITOR_WIDTH} from "../../../utilities/constants";
 import {getProp} from "../../../utilities/filters";
 import RichTextEditor from "../../RichTextEditor";
 import showUnAuthModal from "../../UnAuthModal";
+
+import BountyTable from "../Bounty/BountyTable";
+import { BountySkill, Skill } from "../Bounty/interfaces";
 
 
 const {Option} = Select;
@@ -65,7 +68,7 @@ const AddTask: React.FunctionComponent<Props> = (
         productSlug,
         closeModal,
         modalType,
-        task,
+        task: challenge,
         submit,
         tasks,
         user,
@@ -75,43 +78,43 @@ const AddTask: React.FunctionComponent<Props> = (
         registerUrl
     }
 ) => {
-    const [title, setTitle] = useState(modalType ? task.title : "");
+    const [title, setTitle] = useState(modalType ? challenge.title : "");
 
     const [treeData, setTreeData] = useState<any>([]);
     const [allTags, setAllTags] = useState([]);
     const [skip, setSkip] = React.useState(false);
-    const [allCategories, setAllCategories] = React.useState([]);
+    const [allSkills, setAllSkills] = React.useState([]);
     const [allExpertises, setAllExpertises] = React.useState([]);
     const [availableExpertises, setAvailableExpertises] = React.useState([]);
     const [allGuides, setAllGuides] = useState([]);
     const [shortDescription, setShortDescription] = useState(
-        modalType ? task.shortDescription : ""
+        modalType ? challenge.shortDescription : ""
     );
     
-    const [category, setCategory] = useState(modalType ? task.taskCategory : "");
+    const [skill, setSkill] = useState(modalType ? challenge.skill : "");
     const [expertise, setExpertise] = useState([]);
     const [contributionGuide, setContributionGuide] = useState(
-        modalType ? task.contributionGuide?.id || null : null
+        modalType ? challenge.contributionGuide?.id || null : null
     );
     const [description, setDescription] = useState(
-        modalType ? task.description : ""
+        modalType ? challenge.description : ""
     );
     const [videoUrl, setVideoUrl] = useState(
-        modalType ? task.videoUrl : ""
+        modalType ? challenge.videoUrl : ""
     );
     const [longDescriptionClear, setLongDescriptionClear] = useState(0);
-    const [status, setStatus] = useState(modalType ? task.status : 2);
-    const [priority, setPriority] = useState<string | number | null>(modalType ? TASK_PRIORITIES.indexOf(task.priority) : null);
+    const [status, setStatus] = useState(modalType ? challenge.status : 2);
+    const [priority, setPriority] = useState<string | number | null>(modalType ? TASK_PRIORITIES.indexOf(challenge.priority) : null);
     const [capability, setCapability] = useState(
-        modalType && task.capability ? task.capability.id : capabilityID
+        modalType && challenge.capability ? challenge.capability.id : capabilityID
     );
     const [initiative, setInitiative] = useState(
-        modalType && task.initiative ? task.initiative.id : initiativeID
+        modalType && challenge.initiative ? challenge.initiative.id : initiativeID
     );
     const [initiatives, setInitiatives] = useState([])
     const [editInitiative, toggleInitiative] = useState(false);
     const [tags, setTags] = useState(
-        modalType && task.tag ? task.tag.map((tag: any) => tag.name) : []
+        modalType && challenge.tag ? challenge.tag.map((tag: any) => tag.name) : []
     );
 
     const [tagsSearchValue, setTagsSearchValue] = useState("");
@@ -135,7 +138,7 @@ const AddTask: React.FunctionComponent<Props> = (
     }, [user]);
 
     const [dependOn, setDependOn] = useState(
-        modalType && task.dependOn ? task.dependOn.map((tag: any) => tag.id) : []
+        modalType && challenge.dependOn ? challenge.dependOn.map((tag: any) => tag.id) : []
     );
 
     const {
@@ -153,14 +156,64 @@ const AddTask: React.FunctionComponent<Props> = (
     const {data: tagsData} = useQuery(GET_TAGS, {
         variables: {productSlug}
     });
-    const [createTask] = useMutation(CREATE_TASK);
-    const [updateTask] = useMutation(UPDATE_TASK);
+    const [createChallenge] = useMutation(CREATE_CHALLENGE);
+    const [updateChallenge] = useMutation(UPDATE_CHALLENGE);
     const [allUsers, setAllUsers] = useState([]);
-    const [reviewSelectValue, setReviewSelectValue] = useState(getProp(task, "reviewer.slug", ""));
+    const [reviewSelectValue, setReviewSelectValue] = useState(getProp(challenge, "reviewer.slug", ""));
     const {data: users} = useQuery(GET_USERS);
     const {data: guidesData} = useQuery(GET_CONTRIBUTOR_GUIDES, {
         variables: {productSlug}
     });
+
+    const [bountySkills, setBountySkills] = useState<any[]>(modalType?challenge.bounty:[]);
+
+    const updateBountySkill = (allBountySkills) => {        
+        let newSkillName = "";
+        allBountySkills.map((skillName) => {
+            let isFound = false;
+            bountySkills.map((bSkill) => { if(bSkill.skill.name === skillName) isFound = true; });
+            if (!isFound) {
+                newSkillName = skillName;
+            }
+        });
+
+        if(newSkillName != "") {
+            let newSkill: Skill = {id: 0, name: '', active: false, selectable: false, children: []};
+
+            allSkills.map((skillParent: Skill) => {
+                skillParent.children.map((skill) => {
+                    if(skill.name == newSkillName) 
+                        newSkill = skill;
+                });
+            });
+            
+            let bounty = {            
+                skill: newSkill, 
+                expertise: [],
+                points: 5,
+            }
+
+            setBountySkills((prevState) => [...prevState, bounty])
+        }
+
+         
+        // now check if we need to remove any bounty
+        let bountyToBeRemoved = -1;
+        bountySkills.map((bSkill, index) => {
+            let isFound = false;
+            allBountySkills.map((skillName) => { if(skillName === bSkill.skill.name) isFound = true; });
+            if(!isFound) bountyToBeRemoved = index;
+        })
+
+        if(bountyToBeRemoved != -1)
+            setBountySkills((prevState) => [...prevState.slice(0, bountyToBeRemoved), ...prevState.slice(bountyToBeRemoved+1)])
+
+        
+        setSkill(allBountySkills);
+
+    }
+
+
 
     const filterOption = (input: string, option: any) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 
@@ -224,7 +277,7 @@ const AddTask: React.FunctionComponent<Props> = (
 
     // @ts-ignore
     tasks = tasks.filter(dependOnTask => {
-        let tId = task && task.hasOwnProperty("id") ? task.id : undefined;
+        let tId = challenge && challenge.hasOwnProperty("id") ? challenge.id : undefined;
         return tId != dependOnTask.id
     });
 
@@ -248,14 +301,14 @@ const AddTask: React.FunctionComponent<Props> = (
     }
 
     useEffect(() => {
-        if (category && category !== "" && allCategories.length) {
+        if (skill && skill !== "" && allSkills.length) {
             // @ts-ignore
-            const taskCategory = findCategory(allCategories, category, null);
+            const taskCategory = findCategory(allSkills, skill, null);
             if (taskCategory) {
                 // @ts-ignore
                 var ae = [];
                 for(let expertise of allExpertises){
-                    if(expertise.category === taskCategory['id']) {
+                    if(expertise.skill === taskCategory['id']) {
                         ae.push(expertise);
                     }
                 }
@@ -266,25 +319,25 @@ const AddTask: React.FunctionComponent<Props> = (
             if(!modalType && allGuides) {
                 setContributionGuide(null);
                 allGuides.map((guide) => {
-                    if(guide.category && guide.category.name == category)
+                    if(guide.skill && guide.skill.name == skill)
                         setContributionGuide(guide.id);
                 });
             }
 
         }
 
-    }, [category]);
+    }, [skill]);
 
     useEffect(() => {
         if(allExpertises.length) {
-            if (category && category !== "" && allCategories.length) {
+            if (skill && skill !== "" && allSkills.length) {
                 // @ts-ignore
-                const taskCategory = findCategory(allCategories, category, null);
+                const taskCategory = findCategory(allSkills, skill, null);
                 if (taskCategory) {
                     // @ts-ignore
                     var ae = [];
                     for(let expertise of allExpertises){
-                        if(expertise.category === taskCategory['id']) {
+                        if(expertise.skill === taskCategory['id']) {
                             ae.push(expertise);
                         }
                     }
@@ -297,9 +350,9 @@ const AddTask: React.FunctionComponent<Props> = (
 
     useEffect(() =>{
         // only update expertise list when updating a task
-        if(availableExpertises.length && task && task.taskExpertise && task.taskExpertise.length) {
+        if(availableExpertises.length && challenge && challenge.taskExpertise && challenge.taskExpertise.length) {
             var exp = [];
-            task.taskExpertise.map((ex) => {exp.push(parseInt(ex.id))});
+            challenge.taskExpertise.map((ex) => {exp.push(parseInt(ex.id))});
             setExpertise(exp);
         }
 
@@ -307,7 +360,7 @@ const AddTask: React.FunctionComponent<Props> = (
 
     useEffect(() => {
         if (categories?.taskCategoryListing) {
-            setAllCategories(JSON.parse(categories.taskCategoryListing));
+            setAllSkills(JSON.parse(categories.taskCategoryListing));
         }
     }, [categories]);
 
@@ -350,6 +403,7 @@ const AddTask: React.FunctionComponent<Props> = (
     }, [originalInitiatives]);
 
     const handleOk = async () => {
+
         if (!title) {
             message.error("Title is required. Please fill out title");
             return;
@@ -360,6 +414,11 @@ const AddTask: React.FunctionComponent<Props> = (
         }
         if (!reviewSelectValue) {
             message.error("Reviewer is required. Please fill out reviewer");
+            return;
+        }
+
+        if(bountySkills.length == 0) {
+            message.error("Bounty is required. Please select bounty.");
             return;
         }
 
@@ -385,7 +444,7 @@ const AddTask: React.FunctionComponent<Props> = (
         setDependOn([]);
         setReviewSelectValue(getProp(user, "slug", null));
         setExpertise("");
-        setCategory("");
+        setSkill("");
     }
 
     const addNewTask = async () => {
@@ -403,16 +462,15 @@ const AddTask: React.FunctionComponent<Props> = (
             priority,
             contributionGuide,
             reviewer: reviewSelectValue,
-            category: category ? findCategory(allCategories, category, null).id : "",
-            expertise
+            bountySkills: JSON.stringify(bountySkills),
         };
 
         try {
             const res = modalType
-                ? await updateTask({
-                    variables: {input, id: parseInt(task.id)}
+                ? await updateChallenge({
+                    variables: {input, id: parseInt(challenge.id)}
                 })
-                : await createTask({
+                : await createChallenge({
                     variables: {input}
                 })
 
@@ -622,17 +680,18 @@ const AddTask: React.FunctionComponent<Props> = (
                     </Select>
                 </Row>
                 <Row className="mb-15">
-                    <label>Task category:</label>
+                    <label>Skill:</label>
                     <TreeSelect
                         allowClear
-                        onChange={setCategory}
-                        placeholder="Select task category"
-                        value={category}
+                        onChange={updateBountySkill}
+                        placeholder="Select skill"
+                        value={skill}
+                        multiple
                     >
-                        {allCategories && makeCategoriesTree(allCategories)}
+                        {allSkills && makeCategoriesTree(allSkills)}
                     </TreeSelect>
                 </Row>
-                <Row className="mb-15">
+                {/* <Row className="mb-15">
                     <label>Expertise:</label>
                     <TreeSelect
                         allowClear
@@ -644,6 +703,15 @@ const AddTask: React.FunctionComponent<Props> = (
                     >
                         {availableExpertises && makeExpertisesTree(availableExpertises)}
                         </TreeSelect>
+                </Row> */}
+                <Row className="mb-15">
+                    <label>Bounty</label>
+                    <BountyTable
+                        bountySkills={bountySkills}
+                        setBountySkills={setBountySkills}
+                        allSkills={allSkills}
+                        allExpertises={allExpertises}                        
+                    />
                 </Row>
                 <Row className="mb-15">
                     <label>Video Link:</label>

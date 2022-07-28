@@ -474,7 +474,7 @@ const AddTask: React.FunctionComponent<Props> = (
                     variables: {input}
                 })
 
-            const modalTypeText = modalType ? "updateTask" : "createTask";
+            const modalTypeText = modalType ? "updateChallenge" : "createChallenge";
             const messageText = getProp(res, `data.${modalTypeText}.message`, "");
 
             if (messageText && getProp(res, `data.${modalTypeText}.status`, false)) {

@@ -16,8 +16,11 @@ export interface Expertise {
 }
 
 export interface BountySkill {
+    id: number,
     skill: Skill,
     expertise: null | Expertise[],
-    points: number
+    points: number,
+    status: number,
+    is_active: boolean
 }
 

@@ -262,18 +262,18 @@ export const ACTIVE_MARKET = gql`
   }
 `;
 
-export const LEAVE_TASK = gql`
-  mutation LeaveTask($taskId: Int!) {
-    leaveTask(taskId: $taskId) {
+export const LEAVE_BOUNTY = gql`
+  mutation LeaveBounty($bountyId: Int!) {
+    leaveBounty(bountyId: $bountyId) {
       success
       message
     }
   }
 `;
 
-export const CLAIM_TASK = gql`
-  mutation ClaimTask($bountyId: Int!) {
-    claimTask(bountyId: $bountyId) {
+export const CLAIM_BOUNTY = gql`
+  mutation ClaimBounty($bountyId: Int!) {
+    claimBounty(bountyId: $bountyId) {
       success
       message
       isNeedAgreement

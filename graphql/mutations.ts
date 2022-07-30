@@ -78,8 +78,8 @@ export const DELETE_PRODUCT = gql`
 
 export const CREATE_CHALLENGE = gql`
   mutation CreateChallenge($input: TaskInput!) {
-    createTask(input: $input) {
-      task {
+    createChallenge(input: $input) {
+      challenge {
         title
       }
       status
@@ -91,7 +91,7 @@ export const CREATE_CHALLENGE = gql`
 export const UPDATE_CHALLENGE = gql`
   mutation UpdateChallenge($input: TaskInput!, $id: Int!) {
     updateChallenge(input: $input, id: $id) {
-      task {
+      challenge {
         title
       }
       status

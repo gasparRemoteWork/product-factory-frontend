@@ -91,7 +91,7 @@ const AddTask: React.FunctionComponent<Props> = (
         modalType ? challenge.shortDescription : ""
     );
     
-    const [skill, setSkill] = useState(modalType ? challenge.skill : "");
+    const [skill, setSkill] = useState(modalType ? challenge.skill : []);
     const [expertise, setExpertise] = useState([]);
     const [contributionGuide, setContributionGuide] = useState(
         modalType ? challenge.contributionGuide?.id || null : null
@@ -444,7 +444,8 @@ const AddTask: React.FunctionComponent<Props> = (
         setDependOn([]);
         setReviewSelectValue(getProp(user, "slug", null));
         setExpertise("");
-        setSkill("");
+        setSkill([]);
+        setBountySkills([]);
     }
 
     const addNewTask = async () => {
@@ -691,21 +692,8 @@ const AddTask: React.FunctionComponent<Props> = (
                         {allSkills && makeCategoriesTree(allSkills)}
                     </TreeSelect>
                 </Row>
-                {/* <Row className="mb-15">
-                    <label>Expertise:</label>
-                    <TreeSelect
-                        allowClear
-                        onChange={setExpertise}
-                        value={expertise}
-                        placeholder="Select expertise"
-                        disabled={!category}
-                        multiple
-                    >
-                        {availableExpertises && makeExpertisesTree(availableExpertises)}
-                        </TreeSelect>
-                </Row> */}
                 <Row className="mb-15">
-                    <label>Bounty</label>
+                    <label>Bounty:</label>
                     <BountyTable
                         bountySkills={bountySkills}
                         setBountySkills={setBountySkills}

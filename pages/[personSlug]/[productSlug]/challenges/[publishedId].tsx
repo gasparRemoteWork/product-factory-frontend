@@ -163,7 +163,10 @@ const Task: React.FunctionComponent<Params> = ({
         setIsContributionGuideVisible(false);
     };
 
-    const [getPersonData, {data: personData}] = useLazyQuery(GET_PERSON, {fetchPolicy: "no-cache"});
+    const [getPersonData, {data: personData}] = useLazyQuery(GET_PERSON, {
+        fetchPolicy: "no-cache",
+        variables: {id: user.id},
+    });
 
     const {data: original, error, loading, refetch} = useQuery(GET_TASK_BY_ID, {
         fetchPolicy: "no-cache",
@@ -227,7 +230,7 @@ const Task: React.FunctionComponent<Params> = ({
                 message.success(responseMessage).then();
                 fetchData().then();
                 showLeaveTaskModal(false);
-                // getPersonData();
+                getPersonData();
             } else {
                 message.error(responseMessage).then();
             }
@@ -390,6 +393,7 @@ const Task: React.FunctionComponent<Params> = ({
                 if (claimBounty.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
+                    getPersonData();
                 } else {
                     message
                         .error(

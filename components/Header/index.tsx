@@ -114,7 +114,7 @@ const HeaderMenuContainer: React.FunctionComponent<Props> = ({user, userLogInAct
                     <Link href={user.claimedTask.link}>
                         <a className="text-grey-9">
                             <BookOutlined/>
-                            <strong>Claimed task:</strong><br/>
+                            <strong>Claimed Bounty:</strong><br/>
                             <div className="truncate" style={{width: 200}}>{user.claimedTask.title}</div>
                         </a>
                     </Link>

@@ -194,7 +194,7 @@ export const DELETE_INITIATIVE = gql`
 export const DELETE_CHALLENGE = gql`
   mutation DeleteChallenge($id: Int!) {
     deleteChallenge(id: $id) {
-      taskId
+      challengeId
       status
     }
   }
@@ -279,6 +279,8 @@ export const CLAIM_BOUNTY = gql`
       isNeedAgreement
       claimedTaskLink
       claimedTaskName
+      claimedBountyProductName
+      claimedBountyProductLink
     }
   }
 `;

@@ -418,7 +418,7 @@ const AddTask: React.FunctionComponent<Props> = (
         }
 
         if(bountySkills.length == 0) {
-            message.error("Bounty is required. Please select bounty.");
+            message.error("You need to have at least one bounty. Select a skill to get started.");
             return;
         }
 

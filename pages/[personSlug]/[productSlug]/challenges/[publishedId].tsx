@@ -79,7 +79,8 @@ const Task: React.FunctionComponent<Params> = ({
                                                     loginUrl,
                                                     registerUrl
                                                }) => {
-    const router = useRouter();
+    const router = useRouter();    
+  
     const {publishedId, personSlug, productSlug} = router.query;
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -132,22 +133,30 @@ const Task: React.FunctionComponent<Params> = ({
         return "N/A";
     }
 
-    const getClaimingPerson = (bounty) => {
+    const getBountyAssignee = (bounty) => {
         let allBountyClaims = task.bountyClaim;
         let claimingPerson = "";
+        let selfClaimed = false;
 
         for(let bountyClaim of allBountyClaims) {
             if(bountyClaim.bounty.id == bounty.id && bountyClaim.kind != 2) {
-                if(bountyClaim.person.id == user.id)
+                if(bountyClaim.person.id === user.id) {
                     claimingPerson = "you";
+                    selfClaimed = true;
+                } 
                 else
-                    claimingPerson = bountyClaim.person.slug
+                    claimingPerson = bountyClaim.person.slug;
 
                 break
             }
         }
 
-        return claimingPerson;
+        return (
+            <span style={{ fontSize: 13, }}>
+                Claimed by {selfClaimed ? 
+                    claimingPerson : (<a href={`/${claimingPerson}`}>@{claimingPerson}</a>)}                
+            </span>
+        )
     }
 
     const [isContributionGuideVisible, setIsContributionGuideVisible] = useState(false);
@@ -399,7 +408,15 @@ const Task: React.FunctionComponent<Params> = ({
                         .error(
                             claimBounty.claimedTaskName ? (
                                 <div>
-                                    You already claimed another bounty on this product:
+                                    You already claimed another bounty on 
+                                    <span
+                                        className="pointer"
+                                        style={{color: "#1890ff"}}
+                                        onClick={() => {
+                                            router.push(claimBounty.claimedBountyProductLink);
+                                            message.destroy();
+                                        }}
+                                    > {claimBounty.claimedBountyProductName}</span>:                                     
                                     <div
                                         className="pointer"
                                         style={{color: "#1890ff"}}
@@ -474,8 +491,6 @@ const Task: React.FunctionComponent<Params> = ({
     };
 
     const updateClaimedBountyId = () => {
-        console.log(task)
-        
         let bountyClaims = getProp(task, "bountyClaim", []);
         let hasClaimedBounty = false;
         for(let bountyClaim of bountyClaims) {
@@ -873,8 +888,7 @@ const Task: React.FunctionComponent<Params> = ({
                                                                 alignItems: "center", width: 120, 
                                                                 padding: '10px', fontWeight: '500' }} key={index}>
                                                     {
-                                                        bounty.status != 2 ?
-                                                        <span style={{ fontSize: 13, }}>Claimed by { getClaimingPerson(bounty) }</span> :
+                                                        bounty.status != 2 ? getBountyAssignee(bounty) :
                                                         <Button type="primary" 
                                                             onClick={() => {claimBountyEvent(bounty.id)}}
                                                         >
@@ -1104,7 +1118,7 @@ const Task: React.FunctionComponent<Params> = ({
                                 <DeleteModal
                                     modal={deleteModal}
                                     closeModal={() => showDeleteModal(false)}
-                                    submit={deleteTask}
+                                    submit={deleteChallenge}
                                     title="Delete bounty"
                                 />
                             )}

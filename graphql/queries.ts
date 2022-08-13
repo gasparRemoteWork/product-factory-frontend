@@ -1109,7 +1109,7 @@ export const GET_PERSON_DONE_TASKS = gql `
       title
       date
       link
-      category {
+      skill {
         id
         name
       }

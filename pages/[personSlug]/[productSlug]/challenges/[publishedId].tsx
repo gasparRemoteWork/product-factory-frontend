@@ -801,7 +801,6 @@ const Task: React.FunctionComponent<Params> = ({
                                                     className="ml-15"
                                                     onClick={() => showEditTask()}
                                                 />
-                                                {/* {status === "In Review" && showSubmissionEvents(1)} */}
                                             </Col>
                                         </>
                                     )}
@@ -899,7 +898,7 @@ const Task: React.FunctionComponent<Params> = ({
                                                                 Claim
                                                             </Button>
                                                     }
-                                                    { bounty.status == 5 && showSubmissionEvents(bounty.id) }
+                                                    { userHasManagerRoots && bounty.status == 5 && showSubmissionEvents(bounty.id) }
                                                 </Row>
                                             </Col>
                                         </Row>

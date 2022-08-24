@@ -32,11 +32,11 @@ import {
     ACCEPT_AGREEMENT,
     CLAIM_BOUNTY,
     DELETE_CHALLENGE,
-    IN_REVIEW_TASK,
+    SUBMIT_BOUNTY,
     LEAVE_BOUNTY,
-    REJECT_TASK,
-    REQUEST_REVISION_TASK,
-    APPROVE_TASK,
+    REJECT_BOUNTY_SUBMISSION,
+    REQUEST_BOUNTY_REVISION,
+    APPROVE_BOUNTY_SUBMISSION,
 } from "../../../../graphql/mutations";
 import {getProp} from "../../../../utilities/filters";
 import {EditIcon} from "../../../../components";
@@ -108,6 +108,7 @@ const Task: React.FunctionComponent<Params> = ({
     const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
 
     const [claimedBountyId, setClaimedBountyId] = useState(0);
+    const [currentBountyId, setCurrentBountyId] = useState(0);
 
     useEffect(() => {
         if (categories?.taskCategoryListing) {
@@ -136,26 +137,31 @@ const Task: React.FunctionComponent<Params> = ({
     const getBountyAssignee = (bounty) => {
         let allBountyClaims = task.bountyClaim;
         let claimingPerson = "";
+        let claimText = "";
         let selfClaimed = false;
 
         for(let bountyClaim of allBountyClaims) {
-            if(bountyClaim.bounty.id == bounty.id && bountyClaim.kind != 2) {
+            if(bountyClaim.bounty.id == bounty.id && bountyClaim.kind != 2) { // kind can be active , in_review or done
                 if(bountyClaim.person.id === user.id) {
-                    claimingPerson = "you";
                     selfClaimed = true;
-                } 
-                else
+                    claimingPerson = "you";
+                }
+                else 
                     claimingPerson = bountyClaim.person.slug;
+
+                if(bountyClaim.kind === 1 || bountyClaim.kind === 3)
+                    claimText = "Claimed by"
+                else if(bountyClaim.kind === 0) 
+                    claimText = "Completed by";
 
                 break
             }
         }
 
         return (
-            <span style={{ fontSize: 13, }}>
-                Claimed by {selfClaimed ? 
-                    claimingPerson : (<a href={`/${claimingPerson}`}>@{claimingPerson}</a>)}                
-            </span>
+            <div style={{ fontSize: 13, width: 100}}>
+                {claimText} {selfClaimed?claimingPerson:(<a href={`/${claimingPerson}`}>@{claimingPerson}</a>)}                
+            </div>
         )
     }
 
@@ -253,14 +259,15 @@ const Task: React.FunctionComponent<Params> = ({
         },
     });
 
-    const [submitTask, {loading: submitTaskLoading}] = useMutation(
-        IN_REVIEW_TASK,
+    const [submitBounty, {loading: submitTaskLoading}] = useMutation(
+        SUBMIT_BOUNTY,
         {
-            variables: {taskId, fileList: files, deliveryMessage},
+            variables: {bountyId: claimedBountyId, fileList: files, deliveryMessage},
             onCompleted(data) {
-                const {inReviewTask} = data;
-                const responseMessage = inReviewTask.message;
-                if (inReviewTask.success) {
+                const {submitBounty} = data;
+                const responseMessage = submitBounty.message;
+                
+                if (submitBounty.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
                     getPersonData();
@@ -273,20 +280,20 @@ const Task: React.FunctionComponent<Params> = ({
                 if(e.message === "The person is undefined, please login to perform this action") {
                     showUnAuthModal("perform this action", loginUrl, registerUrl, true);
                 } else {                
-                    message.error("Failed to submit the task in review!").then();
+                    message.error("Failed to submit the bounty for review!").then();
                 }
             },
         }
     );
 
-    const [rejectTask, {loading: rejectTaskLoading}] = useMutation(
-        REJECT_TASK,
+    const [rejectBountySubmission, {loading: rejectTaskLoading}] = useMutation(
+        REJECT_BOUNTY_SUBMISSION,
         {
-            variables: {taskId},
+            variables: {bountyId: currentBountyId},
             onCompleted(data) {
-                const {rejectTask} = data;
-                const responseMessage = rejectTask.message;
-                if (rejectTask.success) {
+                const {rejectBountySubmission} = data;
+                const responseMessage = rejectBountySubmission.message;
+                if (rejectBountySubmission.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
                     showRejectTaskModal(false);
@@ -300,20 +307,20 @@ const Task: React.FunctionComponent<Params> = ({
                 if(e.message === "The person is undefined, please login to perform this action") {
                     showUnAuthModal("perform this action", loginUrl, registerUrl, true);
                 } else {                
-                    message.error("Failed to reject a work!").then();
+                    message.error("Failed to reject the bounty submission!").then();
                 }
             },
         }
     );
 
-    const [requestRevisionTask, {loading: requestRevisionTaskLoading}] = useMutation(
-        REQUEST_REVISION_TASK,
+    const [requestBountyRevision, {loading: requestRevisionTaskLoading}] = useMutation(
+        REQUEST_BOUNTY_REVISION,
         {
-            variables: {taskId},
+            variables: {bountyId: currentBountyId},
             onCompleted(data) {
-                const {requestRevisionTask} = data;
-                const responseMessage = requestRevisionTask.message;
-                if (requestRevisionTask.success) {
+                const {requestBountyRevision} = data;
+                const responseMessage = requestBountyRevision.message;
+                if (requestBountyRevision.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
                     showRejectTaskModal(false);
@@ -324,19 +331,19 @@ const Task: React.FunctionComponent<Params> = ({
                 }
             },
             onError() {
-                message.error("Failed to request revision for a work!").then();
+                message.error("Failed to request revision for the bounty submission!").then();
             },
         }
     );
 
-    const [approveTask, {loading: approveTaskLoading}] = useMutation(
-        APPROVE_TASK,
+    const [approveBountySubmission, {loading: approveTaskLoading}] = useMutation(
+        APPROVE_BOUNTY_SUBMISSION,
         {
-            variables: {taskId},
+            variables: {bountyId: currentBountyId},
             onCompleted(data) {
-                const {approveTask} = data;
-                const responseMessage = approveTask.message;
-                if (approveTask.success) {
+                const {approveBountySubmission} = data;
+                const responseMessage = approveBountySubmission.message;
+                if (approveBountySubmission.success) {
                     message.success(responseMessage).then();
                     fetchData().then();
                     showApproveTaskModal(false);
@@ -350,7 +357,7 @@ const Task: React.FunctionComponent<Params> = ({
                 if(e.message === "The person is undefined, please login to perform this action") {
                     showUnAuthModal("perform this action", loginUrl, registerUrl, true);
                 } else {                
-                    message.error("Failed to approve a work!").then();
+                    message.error("Failed to approve the bounty submission!").then();
                 }
             },
         }
@@ -365,7 +372,7 @@ const Task: React.FunctionComponent<Params> = ({
             if (messageText !== "") {
                 if (status) {
                     message.success(messageText).then();
-                    claimBountyEvent();
+                    claimBountyEvent(claimedBountyId);
                 } else {
                     message.error(messageText).then();
                 }
@@ -494,7 +501,7 @@ const Task: React.FunctionComponent<Params> = ({
         let bountyClaims = getProp(task, "bountyClaim", []);
         let hasClaimedBounty = false;
         for(let bountyClaim of bountyClaims) {
-            if(bountyClaim.person.id == user.id) {
+            if(bountyClaim.person.id == user.id && bountyClaim.kind == 1) {
                 setClaimedBountyId(bountyClaim.bounty.id);
                 hasClaimedBounty = true;
                 break;
@@ -505,6 +512,7 @@ const Task: React.FunctionComponent<Params> = ({
             setClaimedBountyId(0);
 
     }
+
 
     useEffect(() => {
         // set the claimed bounty
@@ -635,7 +643,7 @@ const Task: React.FunctionComponent<Params> = ({
                 <Row className="text-sm">
                     {assignee && !inReview ? (
                         <>
-                            {assignee.id === user.id && taskStatus === "Claimed" ? (
+                            {assignee.id === user.id && claimedBountyId !== 0 ? (
                                 <div className="flex-column ml-auto mt-10">
                                     <Button
                                         type="primary"
@@ -696,37 +704,33 @@ const Task: React.FunctionComponent<Params> = ({
 
     if (inReview && status !== "Done") status = "In Review";
 
-    const showInReviewEvents = () => {
+    const showSubmissionEvents = (bountyId) => {
             return (
-                <Row className="text-sm">
-                    <div className=" mt-5">
-                        <Button
-                            type="primary"
-                            className="mb-10"
-                            style={{zIndex: 1000}}
-                            onClick={() => showApproveTaskModal(true)}
-                        >
-                            Approve the work
-                        </Button>
-                        <Button
-                            type="primary"
-                            onClick={() => showRejectTaskModal(true)}
-                            style={{zIndex: 1000}}
-                        >
-                            Reject the work
-                        </Button>
-                        <div style={{marginLeft: 67, textAlign: "left", fontSize: 14, marginTop: 9}} className="mb-10">The
-                            task is submitted for
-                            review.<br/> See <div
-                                onClick={() => {
-                                    setDeliveryModal(true);
-                                }} style={{
-                                display: "inline-block",
-                                color: "#188ffe",
-                                textDecorationLine: "underline"
-                            }}>Delivery Message</div></div>
-                    </div>
-                </Row>
+                <div style={{marginLeft: 10}}>
+                    <Button
+                        type="primary"
+                        style={{padding: "4px 7px", fontSize: 13}}
+                        onClick={() => {
+                            setCurrentBountyId(bountyId);
+                            showApproveTaskModal(true);
+                        }}>Approve</Button>
+                    
+                    <Button
+                        type="primary"
+                        style={{marginLeft: 5, padding: "4px 7px", fontSize: 13}}
+                        onClick={() => {
+                            setCurrentBountyId(bountyId);
+                            showRejectTaskModal(true);
+                        }}>Reject</Button>
+
+                    <div style={{ textAlign: "center", marginTop: 3, 
+                        color: "#188ffe", textDecorationLine: "underline",
+                        cursor: "pointer", fontSize: 13 }} 
+                        onClick={() => { 
+                            setCurrentBountyId(bountyId);
+                            setDeliveryModal(true); 
+                        }}>View Message</div>
+                </div>
             );
         }
     ;
@@ -743,7 +747,9 @@ const Task: React.FunctionComponent<Params> = ({
                 <Spin
                     tip="Loading..."
                     spinning={
-                        loading || leaveTaskLoading || claimTaskLoading || submitTaskLoading || checkLoggedInUserLoading
+                        loading || leaveTaskLoading || claimTaskLoading || submitTaskLoading || 
+                        requestRevisionTaskLoading || approveTaskLoading ||
+                        rejectTaskLoading || checkLoggedInUserLoading
                     }
                     delay={200}
                 >
@@ -795,7 +801,7 @@ const Task: React.FunctionComponent<Params> = ({
                                                     className="ml-15"
                                                     onClick={() => showEditTask()}
                                                 />
-                                                {status === "In Review" && showInReviewEvents()}
+                                                {/* {status === "In Review" && showSubmissionEvents(1)} */}
                                             </Col>
                                         </>
                                     )}
@@ -826,22 +832,22 @@ const Task: React.FunctionComponent<Params> = ({
 
                                         <Row>
                                             <Col>
-                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', minWidth: 280}}>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 280}}>
                                                     Skill
                                                 </Row>
                                             </Col>
                                             <Col>
-                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', minWidth: 300}}>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 200}}>
                                                     Expertise
                                                 </Row>
                                             </Col>
                                             <Col>
-                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 80}}>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 60}}>
                                                     Points
                                                 </Row>
                                             </Col>
                                             <Col>
-                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 120}}>
+                                                <Row style={{backgroundColor: '#FAFAFA', padding: '10px', width: 260}}>
                                                     Action
                                                 </Row>
                                             </Col>
@@ -850,7 +856,7 @@ const Task: React.FunctionComponent<Params> = ({
                                         <Row>
                                             <Col>
                                                 <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
-                                                                alignItems: "center", minWidth: 280, fontWeight: '500' }} key={index}>
+                                                                alignItems: "center", width: 280, fontWeight: '500' }} key={index}>
                                                     <Typography.Text style={{
                                                         fontSize: 13,
                                                         minWidth: 280,
@@ -863,7 +869,7 @@ const Task: React.FunctionComponent<Params> = ({
                                             </Col>
                                             <Col>
                                                 <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
-                                                                alignItems: "center", minWidth: 300, padding: 10, 
+                                                                alignItems: "center", width: 200, padding: 10, 
                                                                 textTransform: 'capitalize', fontWeight: '500' }} key={index}>
                                                     {
                                                         bounty.expertise.map((exp, idx) => { 
@@ -878,23 +884,22 @@ const Task: React.FunctionComponent<Params> = ({
                                             </Col>
                                             <Col>
                                                 <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
-                                                                alignItems: "center", width: 80, 
+                                                                alignItems: "center", width: 60, 
                                                                 padding: '10px', fontWeight: '500' }} key={index}>
                                                     {bounty.points}
                                                 </Row>
                                             </Col>
                                             <Col>
                                                 <Row style={{   borderBottom: '1px solid #FAFAFA', height: "100%", 
-                                                                alignItems: "center", width: 120, 
+                                                                alignItems: "center", width: 260, 
                                                                 padding: '10px', fontWeight: '500' }} key={index}>
                                                     {
                                                         bounty.status != 2 ? getBountyAssignee(bounty) :
-                                                        <Button type="primary" 
-                                                            onClick={() => {claimBountyEvent(bounty.id)}}
-                                                        >
-                                                            Claim
-                                                        </Button>                                                        
+                                                            <Button type="primary" onClick={() => {claimBountyEvent(bounty.id)}}>
+                                                                Claim
+                                                            </Button>
                                                     }
+                                                    { bounty.status == 5 && showSubmissionEvents(bounty.id) }
                                                 </Row>
                                             </Col>
                                         </Row>
@@ -1139,7 +1144,7 @@ const Task: React.FunctionComponent<Params> = ({
                                 <ToReviewModal
                                     modal={reviewTaskModal}
                                     closeModal={() => showReviewTaskModal(false)}
-                                    submit={submitTask}
+                                    submit={() => {showReviewTaskModal(false); submitBounty(); }}
                                     files={files}
                                     setFiles={setFiles}
                                     fileList={fileList}
@@ -1164,11 +1169,13 @@ const Task: React.FunctionComponent<Params> = ({
                                 <CustomModal
                                     modal={rejectTaskModal}
                                     closeModal={() => showRejectTaskModal(false)}
-                                    submit={requestRevisionTask}
-                                    title="Reject the work"
-                                    message="Please choose one of the options below to reject the contribution."
+                                    submit={() => { showRejectTaskModal(false); requestBountyRevision(); }}
+                                    title="Reject bounty submission"
+                                    message="Please choose one of the options below to reject the bounty submission."
                                     submitText="Ask for revision"
-                                    secondarySubmits={[{text:"Unassign", action: rejectTask}]}
+                                    secondarySubmits={[{text: "Unassign", 
+                                        action: () => { showRejectTaskModal(false); rejectBountySubmission(); } 
+                                    }]}
                                     displayCancelButton={false}
                                 />
                             )}
@@ -1176,7 +1183,7 @@ const Task: React.FunctionComponent<Params> = ({
                                 <CustomModal
                                     modal={approveTaskModal}
                                     closeModal={() => showApproveTaskModal(false)}
-                                    submit={approveTask}
+                                    submit={() => { showApproveTaskModal(false); approveBountySubmission(); }}
                                     title="Approve the work"
                                     message="Do you really want to approve the work?"
                                     submitText="Yes, approve"
@@ -1186,10 +1193,10 @@ const Task: React.FunctionComponent<Params> = ({
                                 <DeliveryMessageModal
                                     modal={deliveryModal}
                                     closeModal={() => setDeliveryModal(false)}
-                                    reject={rejectTask}
-                                    requestRevision={requestRevisionTask}
-                                    submit={approveTask}
-                                    taskId={taskId}/>
+                                    reject={() => { setDeliveryModal(false); rejectBountySubmission(); }}
+                                    requestRevision={() => { setDeliveryModal(false); requestBountyRevision(); }}
+                                    submit={() => { setDeliveryModal(false); approveBountySubmission(); }}
+                                    bountyId={currentBountyId}/>
                             )}
                         </>
                     )}

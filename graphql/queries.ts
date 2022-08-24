@@ -812,7 +812,7 @@ export const GET_TAGS = gql`
 
 export const GET_TASK_COMMENTS = gql`
   query GetTaskComments($objectId: Int!) {
-    taskComments(objectId: $objectId)
+    challengeComments(objectId: $objectId)
   }
 `;
 
@@ -998,7 +998,7 @@ export const GET_CONTRIBUTOR_GUIDES = gql`
   }
 `;
 
-export const GET_TASK_DELIVERY_ATTEMPT = gql`
+export const GET_BOUNTY_DELIVERY_ATTEMPT = gql`
   query GetTaskDeliveryAttempt($id: Int!) {
     attempt(id: $id) {
       id,
@@ -1012,11 +1012,18 @@ export const GET_TASK_DELIVERY_ATTEMPT = gql`
         fileType,
         name
       },
-      taskClaim {
+      bountyClaim {
         id
-        challenge {
-          id, 
-          title
+        kind
+        bounty {
+          id
+          points
+          status
+          isActive
+          challenge {
+            id, 
+            title
+          }
         }
       },
     }

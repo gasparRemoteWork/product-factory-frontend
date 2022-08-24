@@ -285,36 +285,36 @@ export const CLAIM_BOUNTY = gql`
   }
 `;
 
-export const IN_REVIEW_TASK = gql`
-  mutation InReviewTask($taskId: Int!, $fileList: [Upload], $deliveryMessage: String) {
-    inReviewTask(taskId: $taskId, fileList: $fileList, deliveryMessage: $deliveryMessage) {
+export const SUBMIT_BOUNTY = gql`
+  mutation SubmitBounty($bountyId: Int!, $fileList: [Upload], $deliveryMessage: String) {
+    submitBounty(bountyId: $bountyId, fileList: $fileList, deliveryMessage: $deliveryMessage) {
       success
       message
     }
   }
 `;
 
-export const REJECT_TASK = gql`
-  mutation rejectTask($taskId: Int!) {
-    rejectTask(taskId: $taskId) {
+export const REJECT_BOUNTY_SUBMISSION = gql`
+  mutation RejectBountySubmision($bountyId: Int!) {
+    rejectBountySubmission(bountyId: $bountyId) {
       success
       message
     }
   }
 `;
 
-export const REQUEST_REVISION_TASK = gql`
-  mutation requestRevisionTask($taskId: Int!) {
-    requestRevisionTask(taskId: $taskId) {
+export const REQUEST_BOUNTY_REVISION = gql`
+  mutation RequestBountyRevision($bountyId: Int!) {
+    requestBountyRevision(bountyId: $bountyId) {
       success
       message
     }
   }
 `;
 
-export const APPROVE_TASK = gql`
-  mutation approveTask($taskId: Int!) {
-    approveTask(taskId: $taskId) {
+export const APPROVE_BOUNTY_SUBMISSION = gql`
+  mutation ApproveBountySubmission($bountyId: Int!) {
+    approveBountySubmission(bountyId: $bountyId) {
       success
       message
     }

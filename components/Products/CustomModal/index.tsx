@@ -8,7 +8,7 @@ type Props = {
     title: string;
     message?: string;
     submitText?: string;
-    secondarySubmits?: [text: string, action: Function]
+    secondarySubmits?: [{text: string, action: Function}]
     displayCancelButton?: boolean
 };
 

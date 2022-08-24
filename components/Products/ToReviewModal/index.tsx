@@ -14,7 +14,7 @@ type Props = {
     setFileList: Function,
     deliveryMessage: string,
     setDeliveryMessage: Function,
-    files: [],
+    files: any[],
     setFiles: Function
 };
 

@@ -4,7 +4,7 @@ import {
   TASK_LIST_TYPES,
   TASK_LIST_TYPES_FOR_CONTRIBUTOR,
   TASK_LIST_TYPES_FOR_GUEST,
-  TASK_PRIORITIES
+  CHALLENGE_PRIORITIES
 } from "../../graphql/types";
 import {useQuery} from "@apollo/react-hooks";
 import {GET_CATEGORIES, GET_TAGS} from "../../graphql/queries";
@@ -127,7 +127,7 @@ const FilterModal: React.FunctionComponent<Props> = ({
               filterOption={filterOption}
               allowClear
             >
-              {TASK_PRIORITIES.map((p: string, index: number) => <Option key={p} value={index}>{p}</Option>)}
+              {CHALLENGE_PRIORITIES.map((p: string, index: number) => <Option key={p} value={index}>{p}</Option>)}
             </Select>
           </Form.Item>
           <Form.Item name="categories" label="Skill">

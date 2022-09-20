@@ -10,7 +10,7 @@ import {
     GET_EXPERTISES_LIST,
 } from "../../../graphql/queries";
 import {CREATE_CHALLENGE, UPDATE_CHALLENGE} from "../../../graphql/mutations";
-import {TASK_TYPES, TASK_PRIORITIES} from "../../../graphql/types";
+import {CHALLENGE_TYPES, CHALLENGE_PRIORITIES} from "../../../graphql/types";
 import AddInitiative from "../AddInitiative";
 import {PlusOutlined, MinusOutlined} from "@ant-design/icons";
 import {RICH_TEXT_EDITOR_WIDTH} from "../../../utilities/constants";
@@ -104,7 +104,7 @@ const AddTask: React.FunctionComponent<Props> = (
     );
     const [longDescriptionClear, setLongDescriptionClear] = useState(0);
     const [status, setStatus] = useState(modalType ? challenge.status : 2);
-    const [priority, setPriority] = useState<string | number | null>(modalType ? TASK_PRIORITIES.indexOf(challenge.priority) : null);
+    const [priority, setPriority] = useState<string | number | null>(modalType ? CHALLENGE_PRIORITIES.indexOf(challenge.priority) : null);
     const [capability, setCapability] = useState(
         modalType && challenge.capability ? challenge.capability.id : capabilityID
     );
@@ -645,7 +645,7 @@ const AddTask: React.FunctionComponent<Props> = (
                         onChange={setStatus}
                         placeholder="Select status"
                     >
-                        {TASK_TYPES.map((option: string, idx: number) => (
+                        {CHALLENGE_TYPES.map((option: string, idx: number) => (
                             <Option key={`status${idx}`} value={idx}>{option}</Option>
                         ))}
                     </Select>
@@ -657,7 +657,7 @@ const AddTask: React.FunctionComponent<Props> = (
                         onChange={setPriority}
                         placeholder="Select priority"
                     >
-                        {TASK_PRIORITIES.map((option: string, idx: number) => (
+                        {CHALLENGE_PRIORITIES.map((option: string, idx: number) => (
                             <Option key={`priority-${idx}`} value={idx}>{option}</Option>
                         ))}
                     </Select>

@@ -154,11 +154,11 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
 
                     <div className="task-box-video">
                       <b className="mr-15">Priority</b>
-                      <Priorities task={taskListing.task}
+                      <Priorities task={taskListing.challenge}
                                   submit={() => submit()}
                                   canEdit={canEdit} />
                     </div>
-                    <p>
+                    {/* <p>
                       <b className="mr-15">Status</b>
                       <span>{taskStatus === "Claimed" ? (
                         <>
@@ -177,10 +177,10 @@ const TaskTableTiles: React.FunctionComponent<Props> = ({
                           )}
                         </>
                       ) : taskStatus}</span>
-                      {/*<b style={{ float: "right" }} className="point">*/}
-                      {/*  10 Points*/}
-                      {/*</b>*/}
-                    </p>
+                      <b style={{ float: "right" }} className="point">
+                       10 Points
+                      </b>
+                    </p> */}
 
                     {category && (
                       <p>

@@ -27,7 +27,7 @@ import {
     GET_CATEGORIES_LIST,
     GET_EXPERTISES_LIST
 } from "../../../../graphql/queries";
-import {TASK_TYPES, USER_ROLES} from "../../../../graphql/types";
+import {CHALLENGE_TYPES, USER_ROLES} from "../../../../graphql/types";
 import {
     ACCEPT_AGREEMENT,
     CLAIM_BOUNTY,
@@ -185,7 +185,7 @@ const Task: React.FunctionComponent<Params> = ({
 
     const {data: original, error, loading, refetch} = useQuery(GET_TASK_BY_ID, {
         fetchPolicy: "no-cache",
-        variables: {publishedId, productSlug},
+        variables: {publishedId: parseInt(publishedId), productSlug},
     });
 
     const {data: tasksData} = useQuery(GET_TASKS_BY_PRODUCT_SHORT, {
@@ -475,11 +475,11 @@ const Task: React.FunctionComponent<Params> = ({
 
         setClaimedBountyId(bountyId);
 
-        claimBounty({variables: {bountyId: bountyId}});
+        claimBounty({variables: {bountyId: parseInt(bountyId)}});
     };
 
     const getCausedBy = (assignedTo: any) => {
-        let status = TASK_TYPES[getProp(task, "status")];
+        let status = CHALLENGE_TYPES[getProp(task, "status")];
 
         switch (status) {
             case "Claimed":
@@ -596,54 +596,23 @@ const Task: React.FunctionComponent<Params> = ({
 
     if (loading) return <Loading/>;
 
-    const showAssignedUser = () => {
-        const assignee = getProp(task, "assignedTo", null);
-        return (
-            <Row className="text-sm mb-10">
-                {assignee ? (
-                    <>
-                        {assignee.id === user.id ? (
-                            <div className="flex-column">
-                                <strong className="my-auto">Claimed by you</strong>
-                            </div>
-                        ) : (
-                            <Row style={{marginTop: 10}} className="text-sm mt-8">
-                                <strong className="my-auto">Claimed by: </strong>
-                                <Row align="middle" style={{marginLeft: 15}}>
-                                    <Col>
-                                        <CustomAvatar2 person={{firstName: getProp(assignee, "firstName", ""),slug: getProp(assignee, "slug", "")}}/>
-                                    </Col>
-                                    <Col>
-                                        <Typography.Link
-                                            className="text-grey-9"
-                                            href={`/${getProp(assignee, "slug", "")}`}
-                                        >
-                                            {getProp(assignee, "firstName", "")}
-                                        </Typography.Link>
-                                    </Col>
-                                </Row>
-                            </Row>
-                        )}
-                    </>
-                ) : null}
-            </Row>
-        );
-    };
-
     const assignedTo = getProp(task, "assignedTo");
     const tags = getProp(task, "tag", []);
 
     const showTaskEvents = () => {
-            const assignee = getProp(task, "assignedTo", null);
-            const taskStatus = TASK_TYPES[getProp(task, "status")];
+            const assigneeList = getProp(task, "assignedTo", []);
+            const taskStatus = CHALLENGE_TYPES[getProp(task, "status")];
             const inReview = getProp(task, "inReview", false);
             const contributionGuide = getProp(task, "contributionGuide", "");
 
+            let userInAssignee = false;
+            assigneeList.map( assignedPerson => { userInAssignee = (assignedPerson.id===user.id)})
+
             return (
                 <Row className="text-sm">
-                    {assignee && !inReview ? (
+                    {assigneeList.length && !inReview ? (
                         <>
-                            {assignee.id === user.id && claimedBountyId !== 0 ? (
+                            {userInAssignee && claimedBountyId !== 0 ? (
                                 <div className="flex-column ml-auto mt-10">
                                     <Button
                                         type="primary"
@@ -698,7 +667,7 @@ const Task: React.FunctionComponent<Params> = ({
         }
     ;
 
-    let status = TASK_TYPES[getProp(task, "status")];
+    let status = CHALLENGE_TYPES[getProp(task, "status")];
     const initiativeName = getProp(task, "initiative.name", undefined);
     const inReview = getProp(task, "inReview", false);
 
@@ -922,8 +891,6 @@ const Task: React.FunctionComponent<Params> = ({
                                             </Row>
                                         )}
 
-                                        {/* {showAssignedUser()} */}
-                                        
                                         <Row style={{marginTop: 10}} className="text-sm mt-8">
                                             <strong className="my-auto">Created By: </strong>
 

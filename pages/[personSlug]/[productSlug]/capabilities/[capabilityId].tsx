@@ -19,7 +19,7 @@ import {
   GET_CAPABILITY_PARENT_CRUMBS,
 } from "../../../../graphql/queries";
 import { DELETE_CAPABILITY } from "../../../../graphql/mutations";
-import { TagType, TASK_TYPES } from "../../../../graphql/types";
+import { TagType, CHALLENGE_TYPES } from "../../../../graphql/types";
 import { getProp } from "../../../../utilities/filters";
 import {
   TaskTable,
@@ -294,7 +294,7 @@ const CapabilityDetail: React.FunctionComponent<ICapabilityDetailProps> = ({
                 submit={() => refetch()}
                 tasks={tasks}
                 productSlug={productSlug}
-                statusList={TASK_TYPES}
+                statusList={CHALLENGE_TYPES}
                 showInitiativeName={true}
                 content={
                   <Col md={8} className="text-right">

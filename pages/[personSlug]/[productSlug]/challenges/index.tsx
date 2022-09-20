@@ -7,7 +7,7 @@ import TaskTableTiles from '../../../../components/TaskTableTiles';
 import AddTask from '../../../../components/Products/AddTask';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
 import {useRouter} from "next/router";
-import {TASK_TYPES} from "../../../../graphql/types";
+import {CHALLENGE_TYPES} from "../../../../graphql/types";
 import Loading from "../../../../components/Loading";
 import {FilterOutlined} from "@ant-design/icons";
 import FilterModal from "../../../../components/FilterModal";
@@ -148,7 +148,7 @@ const TasksPage: React.FunctionComponent<Props> = (props: Props) => {
               <TaskTableTiles
                 submit={() => refetch(productsVariable)}
                 tasks={tasks}
-                statusList={TASK_TYPES}
+                statusList={CHALLENGE_TYPES}
                 showInitiativeName={true}
                 showProductName={false}
                 gridSizeLg={8}

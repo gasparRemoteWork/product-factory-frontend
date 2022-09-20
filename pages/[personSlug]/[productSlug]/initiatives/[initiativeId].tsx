@@ -13,7 +13,7 @@ import {getProp} from '../../../../utilities/filters';
 import {getUserRole, hasManagerRoots, randomKeys} from '../../../../utilities/utils';
 import LeftPanelContainer from '../../../../components/HOC/withLeftPanel';
 import Loading from "../../../../components/Loading";
-import {TASK_TYPES} from "../../../../graphql/types";
+import {CHALLENGE_TYPES} from "../../../../graphql/types";
 import FilterModal from "../../../../components/FilterModal";
 import { FilterOutlined, EditOutlined } from "@ant-design/icons";
 import AvatarIcon from "../../../../components/AvatarIcon";
@@ -176,7 +176,7 @@ const InitiativeDetail: React.FunctionComponent<Params> = ({user, loginUrl, regi
 
             <TaskTable
               tasks={tasks}
-              statusList={TASK_TYPES}
+              statusList={CHALLENGE_TYPES}
               productSlug={productSlug}
               content={<Col md={8} className="text-right">
                               <Button type="primary"

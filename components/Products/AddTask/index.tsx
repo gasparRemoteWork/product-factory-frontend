@@ -104,7 +104,7 @@ const AddTask: React.FunctionComponent<Props> = (
     );
     const [longDescriptionClear, setLongDescriptionClear] = useState(0);
     const [status, setStatus] = useState(modalType ? challenge.status : 2);
-    const [priority, setPriority] = useState<string | number | null>(modalType ? CHALLENGE_PRIORITIES.indexOf(challenge.priority) : null);
+    const [priority, setPriority] = useState<number | null>(modalType ? CHALLENGE_PRIORITIES.indexOf(challenge.priority) : null);
     const [capability, setCapability] = useState(
         modalType && challenge.capability ? challenge.capability.id : capabilityID
     );
@@ -657,7 +657,7 @@ const AddTask: React.FunctionComponent<Props> = (
                         onChange={setPriority}
                         placeholder="Select priority"
                     >
-                        {CHALLENGE_PRIORITIES.map((option: string, idx: number) => (
+                        {CHALLENGE_PRIORITIES.map((option, idx: number) => (
                             <Option key={`priority-${idx}`} value={idx}>{option}</Option>
                         ))}
                     </Select>

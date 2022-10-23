@@ -271,6 +271,15 @@ export const LEAVE_BOUNTY = gql`
   }
 `;
 
+export const UNASSIGN_BOUNTY = gql`
+  mutation UnassignBounty($bountyId: Int!) {
+    unassignBounty(bountyId: $bountyId) {
+      success
+      message
+    }
+  }
+`;
+
 export const CLAIM_BOUNTY = gql`
   mutation ClaimBounty($bountyId: Int!) {
     claimBounty(bountyId: $bountyId) {

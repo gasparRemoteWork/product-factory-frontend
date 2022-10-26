@@ -34,7 +34,6 @@ import {
     DELETE_CHALLENGE,
     SUBMIT_BOUNTY,
     LEAVE_BOUNTY,
-    UNASSIGN_BOUNTY,
     REJECT_BOUNTY_SUBMISSION,
     REQUEST_BOUNTY_REVISION,
     APPROVE_BOUNTY_SUBMISSION,
@@ -108,8 +107,8 @@ const Task: React.FunctionComponent<Params> = ({
     const {data: categories} = useQuery(GET_CATEGORIES_LIST);
     const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
 
-    const [claimedBountyId, setClaimedBountyId] = useState<Number>(0);
-    const [currentBountyId, setCurrentBountyId] = useState<Number>(0);
+    const [claimedBountyId, setClaimedBountyId] = useState(0);
+    const [currentBountyId, setCurrentBountyId] = useState(0);
 
     useEffect(() => {
         if (categories?.taskCategoryListing) {
@@ -237,8 +236,8 @@ const Task: React.FunctionComponent<Params> = ({
         setAgreementModalVisible(false);
     };
 
-    const [leaveBounty, {loading: leaveBountyLoading}] = useMutation(LEAVE_BOUNTY, {
-        variables: {bountyId: parseInt(claimedBountyId)},
+    const [leaveBounty, {loading: leaveTaskLoading}] = useMutation(LEAVE_BOUNTY, {
+        variables: {bountyId: claimedBountyId},
         onCompleted(data) {
             const {leaveBounty} = data;
             const responseMessage = leaveBounty.message;
@@ -260,31 +259,10 @@ const Task: React.FunctionComponent<Params> = ({
         },
     });
 
-    const [unassignBounty, {loading: unassignBountyLoading}] = useMutation(UNASSIGN_BOUNTY, {
-        onCompleted(data) {
-            const {unassignBounty} = data;
-            const responseMessage = unassignBounty.message;
-            if (unassignBounty.success) {
-                message.success(responseMessage).then();
-                fetchData().then();
-                getPersonData();
-            } else {
-                message.error(responseMessage).then();
-            }
-        },
-        onError(e) {
-            if(e.message === "The person is undefined, please login to perform this action") {
-                showUnAuthModal("perform this action", loginUrl, registerUrl, true);
-            } else {            
-                message.error("Failed to unassign the bounty!").then();
-            }
-        },
-    });
-
-    const [submitBounty, {loading: submitBountyLoading}] = useMutation(
+    const [submitBounty, {loading: submitTaskLoading}] = useMutation(
         SUBMIT_BOUNTY,
         {
-            variables: {bountyId: parseInt(claimedBountyId), fileList: files, deliveryMessage},
+            variables: {bountyId: claimedBountyId, fileList: files, deliveryMessage},
             onCompleted(data) {
                 const {submitBounty} = data;
                 const responseMessage = submitBounty.message;
@@ -308,10 +286,10 @@ const Task: React.FunctionComponent<Params> = ({
         }
     );
 
-    const [rejectBountySubmission, {loading: rejectBountyLoading}] = useMutation(
+    const [rejectBountySubmission, {loading: rejectTaskLoading}] = useMutation(
         REJECT_BOUNTY_SUBMISSION,
         {
-            variables: {bountyId: parseInt(currentBountyId)},
+            variables: {bountyId: currentBountyId},
             onCompleted(data) {
                 const {rejectBountySubmission} = data;
                 const responseMessage = rejectBountySubmission.message;
@@ -335,7 +313,7 @@ const Task: React.FunctionComponent<Params> = ({
         }
     );
 
-    const [requestBountyRevision, {loading: requestRevisionBountyLoading}] = useMutation(
+    const [requestBountyRevision, {loading: requestRevisionTaskLoading}] = useMutation(
         REQUEST_BOUNTY_REVISION,
         {
             variables: {bountyId: currentBountyId},
@@ -358,7 +336,7 @@ const Task: React.FunctionComponent<Params> = ({
         }
     );
 
-    const [approveBountySubmission, {loading: approveBountyLoading}] = useMutation(
+    const [approveBountySubmission, {loading: approveTaskLoading}] = useMutation(
         APPROVE_BOUNTY_SUBMISSION,
         {
             variables: {bountyId: currentBountyId},
@@ -419,7 +397,7 @@ const Task: React.FunctionComponent<Params> = ({
         }
     }, [licenseOriginal]);
 
-    const [claimBounty, {loading: claimBountyLoading}] = useMutation(CLAIM_BOUNTY, {        
+    const [claimBounty, {loading: claimTaskLoading}] = useMutation(CLAIM_BOUNTY, {        
         onCompleted(data) {
             const {claimBounty} = data;
             const responseMessage = claimBounty.message;
@@ -495,11 +473,9 @@ const Task: React.FunctionComponent<Params> = ({
             return;
         }
 
-        bountyId = parseInt(bountyId);
-
         setClaimedBountyId(bountyId);
 
-        claimBounty({variables: {bountyId: bountyId}});
+        claimBounty({variables: {bountyId: parseInt(bountyId)}});
     };
 
     const getCausedBy = (assignedTo: any) => {
@@ -624,18 +600,17 @@ const Task: React.FunctionComponent<Params> = ({
     const tags = getProp(task, "tag", []);
 
     const showTaskEvents = () => {
-            const assignedTo = getProp(task, "assignedTo", []);
+            const assigneeList = getProp(task, "assignedTo", []);
             const taskStatus = CHALLENGE_TYPES[getProp(task, "status")];
             const inReview = getProp(task, "inReview", false);
             const contributionGuide = getProp(task, "contributionGuide", "");
 
-            let userInAssignee = assignedTo.find( assignee => (assignee.id === user.id) );
-            
-            console.log(userInAssignee, claimedBountyId);
+            let userInAssignee = false;
+            assigneeList.map( assignedPerson => { userInAssignee = (assignedPerson.id===user.id)})
 
             return (
                 <Row className="text-sm">
-                    {assignedTo.length && !inReview ? (
+                    {assigneeList.length && !inReview ? (
                         <>
                             {userInAssignee && claimedBountyId !== 0 ? (
                                 <div className="flex-column ml-auto mt-10">
@@ -699,66 +674,35 @@ const Task: React.FunctionComponent<Params> = ({
     if (inReview && status !== "Done") status = "In Review";
 
     const showSubmissionEvents = (bountyId) => {
-        bountyId = parseInt(bountyId);
+            return (
+                <div style={{marginLeft: 10}}>
+                    <Button
+                        type="primary"
+                        style={{padding: "4px 7px", fontSize: 13}}
+                        onClick={() => {
+                            setCurrentBountyId(bountyId);
+                            showApproveTaskModal(true);
+                        }}>Approve</Button>
+                    
+                    <Button
+                        type="primary"
+                        style={{marginLeft: 5, padding: "4px 7px", fontSize: 13}}
+                        onClick={() => {
+                            setCurrentBountyId(bountyId);
+                            showRejectTaskModal(true);
+                        }}>Reject</Button>
 
-        return (
-            <div style={{marginLeft: 10}}>
-                <Button
-                    type="primary"
-                    style={{padding: "4px 7px", fontSize: 13}}
-                    onClick={() => {
-                        setCurrentBountyId(bountyId);
-                        showApproveTaskModal(true);
-                    }}
-                >
-                    Approve
-                </Button>
-                
-                <Button
-                    type="primary"
-                    danger
-                    style={{marginLeft: 5, padding: "4px 7px", fontSize: 13}}
-                    onClick={() => {
-                        setCurrentBountyId(bountyId);
-                        showRejectTaskModal(true);
-                    }}
-                >
-                    Reject
-                </Button>
-
-                <div style={{ textAlign: "center", marginTop: 3, 
-                    color: "#188ffe", textDecorationLine: "underline",
-                    cursor: "pointer", fontSize: 13 }} 
-                    onClick={() => { 
-                        setCurrentBountyId(bountyId);
-                        setDeliveryModal(true); 
-                    }}
-                >
-                    View Message
+                    <div style={{ textAlign: "center", marginTop: 3, 
+                        color: "#188ffe", textDecorationLine: "underline",
+                        cursor: "pointer", fontSize: 13 }} 
+                        onClick={() => { 
+                            setCurrentBountyId(bountyId);
+                            setDeliveryModal(true); 
+                        }}>View Message</div>
                 </div>
-            </div>
-        );
-    };
-
-    const showClaimedEvents = (bountyId) => {
-        bountyId = parseInt(bountyId);
-
-        return (
-            <div style={{marginLeft: 10}}>
-                <Button
-                    type="primary"
-                    danger
-                    style={{padding: "4px 7px", fontSize: 13}}
-                    onClick={() => {
-                        unassignBounty({variables: {bountyId: bountyId}}).then();
-                    }}
-                >
-                    Unassign
-                </Button>                
-            </div>
-        );
-    };
-
+            );
+        }
+    ;
     const videoLink = getProp(task, "previewVideoUrl", null);
 
     return (
@@ -772,10 +716,9 @@ const Task: React.FunctionComponent<Params> = ({
                 <Spin
                     tip="Loading..."
                     spinning={
-                        loading || leaveBountyLoading || unassignBountyLoading || 
-                        claimBountyLoading || submitBountyLoading || 
-                        requestRevisionBountyLoading || approveBountyLoading ||
-                        rejectBountyLoading || checkLoggedInUserLoading
+                        loading || leaveTaskLoading || claimTaskLoading || submitTaskLoading || 
+                        requestRevisionTaskLoading || approveTaskLoading ||
+                        rejectTaskLoading || checkLoggedInUserLoading
                     }
                     delay={200}
                 >
@@ -924,7 +867,6 @@ const Task: React.FunctionComponent<Params> = ({
                                                                 Claim
                                                             </Button>
                                                     }
-                                                    { userHasManagerRoots && bounty.status == 3 && showClaimedEvents(bounty.id) }
                                                     { userHasManagerRoots && bounty.status == 5 && showSubmissionEvents(bounty.id) }
                                                 </Row>
                                             </Col>

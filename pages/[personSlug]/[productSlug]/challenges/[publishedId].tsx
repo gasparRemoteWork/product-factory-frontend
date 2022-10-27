@@ -108,8 +108,8 @@ const Task: React.FunctionComponent<Params> = ({
     const {data: categories} = useQuery(GET_CATEGORIES_LIST);
     const {data: expertises} = useQuery(GET_EXPERTISES_LIST);
 
-    const [claimedBountyId, setClaimedBountyId] = useState<Number>(0);
-    const [currentBountyId, setCurrentBountyId] = useState<Number>(0);
+    const [claimedBountyId, setClaimedBountyId] = useState(0);
+    const [currentBountyId, setCurrentBountyId] = useState(0);
 
     useEffect(() => {
         if (categories?.taskCategoryListing) {
@@ -238,7 +238,7 @@ const Task: React.FunctionComponent<Params> = ({
     };
 
     const [leaveBounty, {loading: leaveBountyLoading}] = useMutation(LEAVE_BOUNTY, {
-        variables: {bountyId: claimedBountyId},
+        variables: {bountyId: parseInt(claimedBountyId)},
         onCompleted(data) {
             const {leaveBounty} = data;
             const responseMessage = leaveBounty.message;
@@ -284,7 +284,7 @@ const Task: React.FunctionComponent<Params> = ({
     const [submitBounty, {loading: submitBountyLoading}] = useMutation(
         SUBMIT_BOUNTY,
         {
-            variables: {bountyId: claimedBountyId, fileList: files, deliveryMessage},
+            variables: {bountyId: parseInt(claimedBountyId), fileList: files, deliveryMessage},
             onCompleted(data) {
                 const {submitBounty} = data;
                 const responseMessage = submitBounty.message;
@@ -311,7 +311,7 @@ const Task: React.FunctionComponent<Params> = ({
     const [rejectBountySubmission, {loading: rejectBountyLoading}] = useMutation(
         REJECT_BOUNTY_SUBMISSION,
         {
-            variables: {bountyId: currentBountyId},
+            variables: {bountyId: parseInt(currentBountyId)},
             onCompleted(data) {
                 const {rejectBountySubmission} = data;
                 const responseMessage = rejectBountySubmission.message;

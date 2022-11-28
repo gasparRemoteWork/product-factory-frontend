@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
-import {Modal, Row, Input, Select, message, Checkbox, TreeSelect} from 'antd';
+import {Modal, Row, Input, Select, message, Checkbox} from 'antd';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 import {
   GET_CAPABILITIES_BY_PRODUCT, GET_PRODUCTS_SHORT
@@ -10,6 +10,7 @@ import {RICH_TEXT_EDITOR_WIDTH} from '../../utilities/constants';
 import {getProp} from "../../utilities/filters";
 import RichTextEditor from "../RichTextEditor";
 import showUnAuthModal from "../UnAuthModal";
+import CustomTreeSelect from '../CustomTreeSelect/CustomTreeSelect';
 
 const {Option} = Select;
 
@@ -274,17 +275,17 @@ const AddEditBug: React.FunctionComponent<Props> = (
         </Row>
         <Row className='mb-15'>
           <label>Related capability:</label>
-          <TreeSelect
+          <CustomTreeSelect
             showSearch
             style={{ width: '100%' }}
-            value={capability ? capability : null}
+            value={capability ? capability : undefined}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             placeholder="Select a capability"
             allowClear
             treeData={capabilityTreeData}
             treeDefaultExpandAll
             filterTreeNode={filterTreeNode}
-            onChange={setCapability}
+            onChange={(s) => setCapability(s ? s.value : undefined)}
           />
         </Row>
         <Row className='mb-15'>

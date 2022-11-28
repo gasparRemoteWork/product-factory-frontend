@@ -93,7 +93,7 @@ const SkillsArea = ({skills, setSkills}: SkillsAreaInterface) => {
 
     const makeCategoriesTree = (categories: Category[]) => {
         return categories.map((category, index) => (
-            <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+            <TreeNode id={index} selectable={category.selectable} checkable={category.selectable} value={category.name} title={category.name}>
                 {category.children ? makeCategoriesTree(category.children) : null}
             </TreeNode>));
     }
@@ -134,12 +134,14 @@ const SkillsArea = ({skills, setSkills}: SkillsAreaInterface) => {
                                                 value={expertise}
                                                 selectable={false}
                                                 title={expertise}
+                                                checkable={false}
                                             >
                                                 {(Object(skillExpertise.expertise)[expertise] as string[]).map((value, index) => (
                                                     <TreeNode
                                                         value={value}
                                                         selectable={true}
                                                         title={value}
+                                                        checkable={true}
                                                     >
                                                         {value}
                                                     </TreeNode>

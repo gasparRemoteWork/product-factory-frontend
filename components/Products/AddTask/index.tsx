@@ -20,6 +20,7 @@ import showUnAuthModal from "../../UnAuthModal";
 
 import BountyTable from "../Bounty/BountyTable";
 import { BountySkill, Skill } from "../Bounty/interfaces";
+import CustomTreeSelect from "../../CustomTreeSelect/CustomTreeSelect";
 
 
 const {Option} = Select;
@@ -508,14 +509,14 @@ const AddTask: React.FunctionComponent<Props> = (
 
     const makeCategoriesTree = (categories: Category[]) => {
         return categories.map((category, index) => (
-            <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+            <TreeNode id={index} selectable={category.selectable} checkable={category.selectable} value={category.name} title={category.name}>
                 {category.children ? makeCategoriesTree(category.children) : null}
             </TreeNode>));
     }
 
     const makeExpertisesTree = (expertises: Expertise[]) => {
         return expertises.map((expertise, index) => (
-            <TreeNode id={index} selectable={expertise.selectable} value={expertise.id} title={expertise.name}>
+            <TreeNode id={index} selectable={expertise.selectable} checkable={expertise.selectable} value={expertise.id} title={expertise.name}>
                 {expertise.children ? makeExpertisesTree(expertise.children) : null}
             </TreeNode>));
     }
@@ -576,7 +577,7 @@ const AddTask: React.FunctionComponent<Props> = (
                     treeData.length > 0 && (
                         <Row className="mb-15">
                             <label>Capability:</label>
-                            <TreeSelect
+                            <CustomTreeSelect
                                 showSearch
                                 style={{width: "100%"}}
                                 value={capability ? capability : null}
@@ -586,7 +587,7 @@ const AddTask: React.FunctionComponent<Props> = (
                                 treeData={treeData}
                                 treeDefaultExpandAll
                                 filterTreeNode={filterTreeNode}
-                                onChange={setCapability}
+                                onChange={(s) => setCapability(s ? s.value : undefined)}
                             />
                         </Row>
                     )
@@ -682,15 +683,15 @@ const AddTask: React.FunctionComponent<Props> = (
                 </Row>
                 <Row className="mb-15">
                     <label>Skill:</label>
-                    <TreeSelect
+                    <CustomTreeSelect
                         allowClear
-                        onChange={updateBountySkill}
+                        onChange={(selecteds) => updateBountySkill(selecteds.map(v => v.value))}
                         placeholder="Select skill"
                         value={skill}
                         multiple
                     >
                         {allSkills && makeCategoriesTree(allSkills)}
-                    </TreeSelect>
+                    </CustomTreeSelect>
                 </Row>
                 <Row className="mb-15">
                     <label>Bounty:</label>

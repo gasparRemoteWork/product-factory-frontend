@@ -1,14 +1,15 @@
 import React from "react";
-import {message, TreeSelect} from "antd";
+import {message} from "antd";
 import {TreeNode} from "antd/lib/tree-select";
 import {Category, Skill, SkillExpertise} from "../../SkillsComponents/interfaces";
 import {SkillsSelectProps} from "../interfaces";
+import CustomTreeSelect from "../../CustomTreeSelect/CustomTreeSelect";
 
 const SkillsSelect = ({allCategories, allExpertises, setSkills, setSkillExpertise, skillExpertise, skills}: SkillsSelectProps) => {
     
     const makeCategoriesTree = (categories: Category[]) => {
         return categories.map((category, index) => (
-            <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+            <TreeNode id={index} selectable={category.selectable} checkable={category.selectable} value={category.name} title={category.name}>
                 {category.children ? makeCategoriesTree(category.children) : null}
             </TreeNode>));
     }
@@ -67,9 +68,9 @@ const SkillsSelect = ({allCategories, allExpertises, setSkills, setSkillExpertis
     }
 
     return (
-        <TreeSelect
+        <CustomTreeSelect
             allowClear={false}
-            onChange={categorySelectChange}
+            onChange={(s) => categorySelectChange(s ? s.value : undefined)}
             placeholder="Please select skills"
             showArrow
             bordered
@@ -80,7 +81,7 @@ const SkillsSelect = ({allCategories, allExpertises, setSkills, setSkillExpertis
             })}
         >
             {allCategories && makeCategoriesTree(allCategories)}
-        </TreeSelect>
+        </CustomTreeSelect>
     );
 }
 

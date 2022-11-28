@@ -45,12 +45,14 @@ const ExpertiseArea = ({setSkills, skillExpertise, expertiseList, setExpertiseLi
                                                 value={expertise}
                                                 selectable={false}
                                                 title={expertise}
+                                                checkable={false}
                                             >
                                                 {(Object(skillExpertise.expertise)[expertise] as string[]).map((value, index) => (
                                                     <TreeNode
                                                         value={value}
                                                         selectable={true}
                                                         title={value}
+                                                        checkable={true}
                                                     >
                                                         {value}
                                                     </TreeNode>

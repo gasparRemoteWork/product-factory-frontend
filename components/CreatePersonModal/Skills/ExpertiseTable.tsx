@@ -1,8 +1,9 @@
 import React from "react";
 import {ExpertiseTableProps} from "../interfaces";
-import {Col, Row, TreeSelect, Typography} from "antd";
+import {Col, Row, Typography} from "antd";
 import {TreeNode} from "antd/lib/tree-select";
 import {Skill} from "../../SkillsComponents/interfaces";
+import CustomTreeSelect from "../../CustomTreeSelect/CustomTreeSelect";
 
 const ExpertiseTable = ({skills, setSkills, skillExpertise}: ExpertiseTableProps) => {
 
@@ -16,11 +17,11 @@ const ExpertiseTable = ({skills, setSkills, skillExpertise}: ExpertiseTableProps
 
     const expertiseTree = (index: number, skillExp) => {
         return (
-            <TreeSelect
+            <CustomTreeSelect
                 key={index}
                 style={{minWidth: 200, padding: 5, width: "max-content"}}
                 allowClear={false}
-                onChange={(value) => expertiseSelectChange(skillExp.skill[1], value as string[], index)}
+                onChange={(value) => expertiseSelectChange(skillExp.skill[1], value.map(v => v.value) as string[], index)}
                 placeholder={"Please Select Expertise"}
                 value={skills[index].expertise ? skills[index].expertise : []}
                 multiple
@@ -32,12 +33,14 @@ const ExpertiseTable = ({skills, setSkills, skillExpertise}: ExpertiseTableProps
                             value={expertise}
                             selectable={false}
                             title={expertise}
+                            checkable={false}
                         >
                             {(Object(skillExp.expertise)[expertise] as string[]).map((value) => (
                                 <TreeNode
                                     value={value}
                                     selectable={true}
                                     title={value}
+                                    checkable={true}
                                 >
                                     {value}
                                 </TreeNode>
@@ -45,7 +48,7 @@ const ExpertiseTable = ({skills, setSkills, skillExpertise}: ExpertiseTableProps
                         </TreeNode>
                     ))
                 }
-            </TreeSelect>
+            </CustomTreeSelect>
         )
     }
 

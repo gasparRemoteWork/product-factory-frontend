@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Modal, Select, Form, Typography, Input, message, TreeSelect} from 'antd';
+import CustomTreeSelect from '../CustomTreeSelect/CustomTreeSelect'
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import {connect} from "react-redux";
 import {WorkState} from "../../lib/reducers/work.reducer";
@@ -48,7 +49,7 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
 
   const makeCategoriesTree = (categories: Category[]) => {
     return categories.map((category, index) => (
-        <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+        <TreeNode id={index} selectable={category.selectable} checkable={category.selectable} value={category.name} title={category.name}>
             {category.children ? makeCategoriesTree(category.children) : null}
         </TreeNode>));
   }
@@ -153,7 +154,7 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
     const input = {
       description,
       title: values.title,
-      category: values.category ? findCategory(allCategories, values.category, null).id : "",
+      category: values.category ? findCategory(allCategories, values.category.value, null).id : "",
       productSlug
     };
     if (item) {
@@ -204,14 +205,14 @@ const ContributionGuideModal: React.FunctionComponent<Props> = ({
                             clear={longDescriptionClear} />
           </Form.Item>
           <Form.Item name="category" label="Guide Category">
-            <TreeSelect
+            <CustomTreeSelect
                 allowClear
-                onChange={setCategory}
+                onChange={(s) => setCategory(s ? s.value : undefined)}
                 placeholder="Select category"
                 value={category}
             >
                 {allCategories && makeCategoriesTree(allCategories)}
-            </TreeSelect>
+            </CustomTreeSelect>
           </Form.Item>
 
         </Form>

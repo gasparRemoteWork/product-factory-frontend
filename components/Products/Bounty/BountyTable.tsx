@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import {Col, Row, TreeSelect, Typography, InputNumber} from "antd";
+import {Col, Row, Typography, InputNumber} from "antd";
 import {TreeNode} from "antd/lib/tree-select";
+import CustomTreeSelect from "../../CustomTreeSelect/CustomTreeSelect";
 
 import { Skill, Expertise, BountySkill } from "./interfaces";
 
@@ -65,11 +66,11 @@ const BountyTable = ({bountySkills, setBountySkills, allSkills, allExpertises}: 
 
         return (
             Object.keys(expertiseOptions).length ? 
-            (<TreeSelect
+            (<CustomTreeSelect
                 key={index}
                 style={{minWidth: 500, padding: 5, width: "max-content"}}
                 allowClear={false}
-                onChange={(value) => expertiseSelectChange(bounty, value as string[], index)}
+                onChange={(value) => expertiseSelectChange(bounty, value.map(v => v.value), index)}
                 placeholder={"Please Select Expertise"}
                 value={selectedExpertises}
                 multiple
@@ -81,12 +82,14 @@ const BountyTable = ({bountySkills, setBountySkills, allSkills, allExpertises}: 
                             value={val}
                             selectable={false}
                             title={val}
+                            checkable={false}
                         >
                             {expertiseOptions[val].map((childVal) => (
                                 <TreeNode
                                     value={childVal.name}
                                     selectable={true}
                                     title={childVal.name}
+                                    checkable={true}
                                 >
                                     {childVal.name}
 
@@ -95,7 +98,7 @@ const BountyTable = ({bountySkills, setBountySkills, allSkills, allExpertises}: 
                         </TreeNode>
                     ))
                 }
-            </TreeSelect>
+            </CustomTreeSelect>
             ) : 
             (<Typography.Text>No selections available</Typography.Text>)
         )

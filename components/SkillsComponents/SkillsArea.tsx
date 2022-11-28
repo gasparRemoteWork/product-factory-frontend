@@ -54,7 +54,7 @@ const SkillsArea = ({
 
     const makeCategoriesTree = (categories: Category[]) => {
         return categories.map((category, index) => (
-            <TreeNode id={index} selectable={category.selectable} value={category.name} title={category.name}>
+            <TreeNode id={index} selectable={category.selectable} checkable={category.selectable} value={category.name} title={category.name}>
                 {category.children ? makeCategoriesTree(category.children) : null}
             </TreeNode>));
     }
